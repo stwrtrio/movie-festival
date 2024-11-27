@@ -3,9 +3,9 @@ package controllers
 import (
 	"net/http"
 
-	"github.com/stwrtrio/movie-festival/models"
-	"github.com/stwrtrio/movie-festival/services"
-	"github.com/stwrtrio/movie-festival/utils"
+	"github.com/stwrtrio/movie-festival/internal/models"
+	"github.com/stwrtrio/movie-festival/internal/services"
+	"github.com/stwrtrio/movie-festival/internal/utils"
 
 	"github.com/labstack/echo/v4"
 )

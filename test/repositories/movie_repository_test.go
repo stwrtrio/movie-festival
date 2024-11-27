@@ -10,8 +10,8 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/joho/godotenv"
 	"github.com/stretchr/testify/assert"
-	"github.com/stwrtrio/movie-festival/models"
-	"github.com/stwrtrio/movie-festival/repositories"
+	"github.com/stwrtrio/movie-festival/internal/models"
+	"github.com/stwrtrio/movie-festival/internal/repositories"
 )
 
 var testDB *sql.DB // Shared DB connection for all tests
@@ -19,7 +19,7 @@ var testDB *sql.DB // Shared DB connection for all tests
 func initTestDB() *sql.DB {
 	// Load .env file in test setup
 
-	if err := godotenv.Load("../.env"); err != nil {
+	if err := godotenv.Load("../../.env"); err != nil {
 		log.Fatal("Error loading .env file")
 	}
 

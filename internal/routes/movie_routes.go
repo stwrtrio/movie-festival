@@ -3,7 +3,7 @@ package routes
 import (
 	"github.com/labstack/echo/v4"
 
-	"github.com/stwrtrio/movie-festival/controllers"
+	"github.com/stwrtrio/movie-festival/internal/controllers"
 )
 
 func RegisterMovieRoutes(e *echo.Echo, movieController *controllers.MovieController) {

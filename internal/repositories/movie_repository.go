@@ -5,7 +5,7 @@ import (
 	"log"
 
 	"github.com/google/uuid"
-	"github.com/stwrtrio/movie-festival/models"
+	"github.com/stwrtrio/movie-festival/internal/models"
 )
 
 type MovieRepository interface {

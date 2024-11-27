@@ -2,13 +2,14 @@ package main
 
 import (
 	"log"
+	"os"
 
 	"github.com/stwrtrio/movie-festival/config"
-	"github.com/stwrtrio/movie-festival/controllers"
-	"github.com/stwrtrio/movie-festival/middlewares"
-	"github.com/stwrtrio/movie-festival/repositories"
-	"github.com/stwrtrio/movie-festival/routes"
-	"github.com/stwrtrio/movie-festival/services"
+	"github.com/stwrtrio/movie-festival/internal/controllers"
+	"github.com/stwrtrio/movie-festival/internal/middlewares"
+	"github.com/stwrtrio/movie-festival/internal/repositories"
+	"github.com/stwrtrio/movie-festival/internal/routes"
+	"github.com/stwrtrio/movie-festival/internal/services"
 
 	"github.com/go-playground/validator/v10"
 	"github.com/joho/godotenv"
@@ -38,6 +39,11 @@ func main() {
 	// Register Routes
 	routes.RegisterMovieRoutes(e, userController)
 
+	port := os.Getenv("SERVER_PORT")
+	if port == "" {
+		port = "8080"
+	}
+
 	// Start server
-	e.Logger.Fatal(e.Start(":8080"))
+	e.Logger.Fatal(e.Start(":" + port))
 }

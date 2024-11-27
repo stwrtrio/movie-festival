@@ -1,8 +1,8 @@
 package services
 
 import (
-	"github.com/stwrtrio/movie-festival/models"
-	"github.com/stwrtrio/movie-festival/repositories"
+	"github.com/stwrtrio/movie-festival/internal/models"
+	"github.com/stwrtrio/movie-festival/internal/repositories"
 )
 
 type MovieService interface {

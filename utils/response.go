@@ -7,13 +7,15 @@ import (
 )
 
 type JsonResponse struct {
+	Code    int         `json:"code"`
 	Status  string      `json:"status"`
 	Message string      `json:"message"`
 	Data    interface{} `json:"data,omitempty"`
 }
 
-func SuccessResponse(ctx echo.Context, message string, data interface{}) error {
+func SuccessResponse(ctx echo.Context, responseCode int, message string, data interface{}) error {
 	response := JsonResponse{
+		Code:    responseCode,
 		Status:  "success",
 		Message: message,
 		Data:    data,

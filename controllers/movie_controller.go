@@ -50,5 +50,5 @@ func (c *MovieController) CreateMovie(ctx echo.Context) error {
 		return utils.FailResponse(ctx, "Failed to create movie", http.StatusInternalServerError)
 	}
 
-	return utils.SuccessResponse(ctx, "Movie created successfully", http.StatusCreated)
+	return utils.SuccessResponse(ctx, http.StatusCreated, "Movie created successfully", nil)
 }

@@ -10,6 +10,7 @@ import (
 
 	"github.com/stwrtrio/movie-festival/internal/controllers"
 	"github.com/stwrtrio/movie-festival/internal/models"
+	"github.com/stwrtrio/movie-festival/tests/mocks"
 
 	"github.com/go-playground/validator/v10"
 	"github.com/labstack/echo/v4"
@@ -20,16 +21,6 @@ import (
 // MockMovieService is a mock implementation of the MovieService interface.
 type MockMovieService struct {
 	mock.Mock
-}
-
-func (m *MockMovieService) CreateMovie(movie *models.Movie) error {
-	args := m.Called(movie)
-	return args.Error(0)
-}
-
-func (m *MockMovieService) UpdateMovie(movie *models.Movie) error {
-	args := m.Called(movie)
-	return args.Error(0)
 }
 
 func NewValidator() *CustomValidator {
@@ -49,7 +40,7 @@ func (cv *CustomValidator) Validate(i interface{}) error {
 // TestCreateMovie tests the CreateMovie method of the MovieController.
 func TestCreateMovie(t *testing.T) {
 	// Create a mock service
-	mockService := new(MockMovieService)
+	mockService := new(mocks.MockMovieService)
 	controller := controllers.NewMovieController(mockService)
 
 	// Prepare test input and expected output
@@ -100,7 +91,7 @@ func TestCreateMovie(t *testing.T) {
 // TestCreateMovie_InvalidRequest tests the CreateMovie method with invalid input.
 func TestCreateMovie_InvalidRequest(t *testing.T) {
 	// Create a mock service
-	mockService := new(MockMovieService)
+	mockService := new(mocks.MockMovieService)
 
 	// Create the controller with the mock service
 	controller := controllers.NewMovieController(mockService)
@@ -132,7 +123,7 @@ func TestCreateMovie_InvalidRequest(t *testing.T) {
 // TestCreateMovie_ServiceError tests the CreateMovie method when the service returns an error.
 func TestCreateMovie_ServiceError(t *testing.T) {
 	// Create a mock service
-	mockService := new(MockMovieService)
+	mockService := new(mocks.MockMovieService)
 
 	// Create the controller with the mock service
 	controller := controllers.NewMovieController(mockService)

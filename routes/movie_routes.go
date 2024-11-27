@@ -8,4 +8,5 @@ import (
 
 func RegisterMovieRoutes(e *echo.Echo, movieController *controllers.MovieController) {
 	e.POST("/api/admin/movies", movieController.CreateMovie)
+	e.POST("/api/admin/movies/:id", movieController.UpdateMovie)
 }

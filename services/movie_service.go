@@ -7,6 +7,7 @@ import (
 
 type MovieService interface {
 	CreateMovie(movie *models.Movie) error
+	UpdateMovie(movie *models.Movie) error
 }
 
 type movieService struct {
@@ -19,4 +20,8 @@ func NewMovieService(repo repositories.MovieRepository) MovieService {
 
 func (s *movieService) CreateMovie(movie *models.Movie) error {
 	return s.repo.Create(movie)
+}
+
+func (s *movieService) UpdateMovie(movie *models.Movie) error {
+	return s.repo.Update(movie)
 }

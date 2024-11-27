@@ -1,0 +1,51 @@
+{
+	"info": {
+		"_postman_id": "6375d0af-fdc6-49a9-a71e-9c13768b8e07",
+		"name": "movie-festival",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "4995030"
+	},
+	"item": [
+		{
+			"name": "user",
+			"item": [
+				{
+					"name": "create_user",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"title\": \"Inception\",\n    \"description\": \"A mind-bending thriller\",\n    \"duration\": 148,\n    \"genres\": \"Sci-Fi,Thriller\",\n    \"watch_url\": \"http://example.com/inception.mp4\",\n    \"artists\": [\n        \"Leonardo DiCaprio\",\n        \"Joseph Gordon-Levitt\",\n        \"Elliot Page\"\n    ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/admin/movies",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"admin",
+								"movies"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}

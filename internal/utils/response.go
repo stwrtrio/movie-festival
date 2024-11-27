@@ -1,8 +1,6 @@
 package utils
 
 import (
-	"net/http"
-
 	"github.com/labstack/echo/v4"
 )
 
@@ -13,17 +11,17 @@ type JsonResponse struct {
 	Data    interface{} `json:"data,omitempty"`
 }
 
-func SuccessResponse(ctx echo.Context, responseCode int, message string, data interface{}) error {
+func SuccessResponse(ctx echo.Context, statusCode int, message string, data interface{}) error {
 	response := JsonResponse{
-		Code:    responseCode,
+		Code:    statusCode,
 		Status:  "success",
 		Message: message,
 		Data:    data,
 	}
-	return ctx.JSON(http.StatusOK, response)
+	return ctx.JSON(statusCode, response)
 }
 
-func FailResponse(ctx echo.Context, message string, statusCode int) error {
+func FailResponse(ctx echo.Context, statusCode int, message string) error {
 	response := JsonResponse{
 		Status:  "fail",
 		Message: message,

@@ -21,14 +21,14 @@ func NewMovieController(service services.MovieService) *MovieController {
 func (c *MovieController) CreateMovie(ctx echo.Context) error {
 	req := new(models.CreateMovieRequest)
 	if err := ctx.Bind(req); err != nil {
-		return utils.FailResponse(ctx, "Invalid request body", http.StatusBadRequest)
+		return utils.FailResponse(ctx, http.StatusBadRequest, "Invalid request body")
 	}
 	if err := ctx.Validate(req); err != nil {
-		return utils.FailResponse(ctx, err.Error(), http.StatusBadRequest)
+		return utils.FailResponse(ctx, http.StatusBadRequest, err.Error())
 	}
 
 	if len(req.Artists) == 0 {
-		return ctx.JSON(http.StatusBadRequest, map[string]string{"error": "At least one artist is required"})
+		return utils.FailResponse(ctx, http.StatusBadRequest, "At least one artist is required")
 	}
 
 	// Convert request data to a Movie model
@@ -47,7 +47,7 @@ func (c *MovieController) CreateMovie(ctx echo.Context) error {
 	}
 
 	if err := c.service.CreateMovie(movie); err != nil {
-		return utils.FailResponse(ctx, "Failed to create movie", http.StatusInternalServerError)
+		return utils.FailResponse(ctx, http.StatusInternalServerError, "Failed to create movie")
 	}
 
 	return utils.SuccessResponse(ctx, http.StatusCreated, "Movie created successfully", nil)
@@ -56,12 +56,12 @@ func (c *MovieController) CreateMovie(ctx echo.Context) error {
 func (c *MovieController) UpdateMovie(ctx echo.Context) error {
 	movieID := ctx.Param("id")
 	if movieID == "" {
-		return utils.FailResponse(ctx, "Invalid request body", http.StatusBadRequest)
+		return utils.FailResponse(ctx, http.StatusBadRequest, "Invalid request body")
 	}
 
 	req := new(models.CreateMovieRequest)
 	if err := ctx.Bind(req); err != nil {
-		return utils.FailResponse(ctx, "Invalid request body", http.StatusBadRequest)
+		return utils.FailResponse(ctx, http.StatusBadRequest, "Invalid request body")
 	}
 
 	// Convert request data to a Movie model
@@ -81,8 +81,8 @@ func (c *MovieController) UpdateMovie(ctx echo.Context) error {
 	}
 
 	if err := c.service.UpdateMovie(movie); err != nil {
-		return utils.FailResponse(ctx, err.Error(), http.StatusInternalServerError)
+		return utils.FailResponse(ctx, http.StatusInternalServerError, "Unexpected error occurred. Please contact support")
 	}
 
-	return utils.SuccessResponse(ctx, http.StatusCreated, "Movie updated successfully", nil)
+	return utils.SuccessResponse(ctx, http.StatusOK, "Movie updated successfully", nil)
 }

@@ -196,7 +196,7 @@
 					"response": []
 				},
 				{
-					"name": "search movies Copy",
+					"name": "track movie views",
 					"request": {
 						"method": "POST",
 						"header": [],

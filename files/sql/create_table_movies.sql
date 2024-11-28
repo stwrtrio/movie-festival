@@ -3,7 +3,6 @@ CREATE TABLE IF NOT EXISTS movie_festival.movies (
     title VARCHAR(255) NOT NULL,
     description TEXT NOT NULL,
     duration INT NOT NULL, -- minutes
-    genres VARCHAR(255) NOT NULL,
     watch_url VARCHAR(255) NOT NULL,
     views INT DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

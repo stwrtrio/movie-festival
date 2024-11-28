@@ -8,6 +8,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/google/uuid"
 	"github.com/stwrtrio/movie-festival/internal/controllers"
 	"github.com/stwrtrio/movie-festival/internal/models"
 	"github.com/stwrtrio/movie-festival/tests/mocks"
@@ -48,7 +49,7 @@ func TestCreateMovie(t *testing.T) {
 		Title:       "Test Movie",
 		Description: "A great movie",
 		Duration:    120,
-		Genres:      "Action,Thriller",
+		Genres:      []string{"Genre A", "Genre B"},
 		WatchURL:    "http://example.com/movie.mp4",
 		Artists:     []string{"Actor A", "Actor B"},
 	}
@@ -57,8 +58,11 @@ func TestCreateMovie(t *testing.T) {
 		Title:       movieRequest.Title,
 		Description: movieRequest.Description,
 		Duration:    movieRequest.Duration,
-		Genres:      movieRequest.Genres,
-		WatchURL:    movieRequest.WatchURL,
+		Genres: []models.Genre{
+			{Name: "Genre A"},
+			{Name: "Genre B"},
+		},
+		WatchURL: movieRequest.WatchURL,
 		Artists: []models.Artist{
 			{Name: "Actor A"},
 			{Name: "Actor B"},
@@ -133,7 +137,7 @@ func TestCreateMovie_ServiceError(t *testing.T) {
 		Title:       "Test Movie",
 		Description: "A great movie",
 		Duration:    120,
-		Genres:      "Action,Thriller",
+		Genres:      []string{"Genre A", "Genre B"},
 		WatchURL:    "http://example.com/movie.mp4",
 		Artists:     []string{"Actor A", "Actor B"},
 	}
@@ -141,8 +145,11 @@ func TestCreateMovie_ServiceError(t *testing.T) {
 		Title:       movieRequest.Title,
 		Description: movieRequest.Description,
 		Duration:    movieRequest.Duration,
-		Genres:      movieRequest.Genres,
-		WatchURL:    movieRequest.WatchURL,
+		Genres: []models.Genre{
+			{Name: "Genre A"},
+			{Name: "Genre B"},
+		},
+		WatchURL: movieRequest.WatchURL,
 		Artists: []models.Artist{
 			{Name: "Actor A"},
 			{Name: "Actor B"},
@@ -167,5 +174,50 @@ func TestCreateMovie_ServiceError(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, http.StatusInternalServerError, rec.Code)
 	assert.Contains(t, rec.Body.String(), "Failed to create movie")
+	mockService.AssertExpectations(t)
+}
+
+func TestGetMostViewedMovie(t *testing.T) {
+	// Create a mock service
+	mockService := new(mocks.MockMovieService)
+	controller := controllers.NewMovieController(mockService)
+
+	mostViewedMovie := &models.Movie{
+		ID:          uuid.NewString(),
+		Title:       "Top Movie",
+		Description: "The most viewed movie",
+		Duration:    120,
+		Genres: []models.Genre{
+			{Name: "Action"},
+			{Name: "Thriller"},
+		},
+		WatchURL: "http://example.com/movie.mp4",
+		Views:    1000,
+	}
+
+	mockService.On("GetMostViewedMovie", mock.Anything).Return(mostViewedMovie, nil)
+
+	e := echo.New()
+	req := httptest.NewRequest(http.MethodGet, "/api/movies/most-viewed", nil)
+	rec := httptest.NewRecorder()
+	ctx := e.NewContext(req, rec)
+
+	// Call the controller method
+	err := controller.GetMostViewedMovie(ctx)
+
+	// Assertions
+	assert.NoError(t, err)
+	assert.Equal(t, http.StatusOK, rec.Code)
+
+	// Parse the response
+	var response map[string]interface{}
+	err = json.Unmarshal(rec.Body.Bytes(), &response)
+	assert.NoError(t, err)
+
+	data := response["data"].(map[string]interface{})
+	assert.Equal(t, "Top Movie", data["title"])
+	assert.Equal(t, float64(1000), data["views"])
+	assert.Equal(t, "The most viewed movie", data["description"])
+
 	mockService.AssertExpectations(t)
 }

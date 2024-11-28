@@ -9,4 +9,6 @@ import (
 func RegisterMovieRoutes(e *echo.Echo, movieController *controllers.MovieController) {
 	e.POST("/api/admin/movies", movieController.CreateMovie)
 	e.POST("/api/admin/movies/:id", movieController.UpdateMovie)
+	e.GET("/api/admin/movies/most-viewed", movieController.GetMostViewedMovie)
+	e.GET("/api/admin/movies/most-viewed-genre", movieController.GetMostViewedGenre)
 }

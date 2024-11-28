@@ -7,7 +7,7 @@
 	},
 	"item": [
 		{
-			"name": "user",
+			"name": "movie",
 			"item": [
 				{
 					"name": "create_movie",
@@ -77,6 +77,50 @@
 								"admin",
 								"movies",
 								"6148dd61-1e72-44cf-9bda-4f5fcccbcfc3"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get most view",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/admin/movies/most-viewed",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"admin",
+								"movies",
+								"most-viewed"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get most view genre",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/admin/movies/most-viewed",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"admin",
+								"movies",
+								"most-viewed"
 							]
 						}
 					},

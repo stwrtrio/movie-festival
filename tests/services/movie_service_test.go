@@ -1,6 +1,7 @@
 package services_test
 
 import (
+	"context"
 	"errors"
 	"testing"
 
@@ -15,14 +16,27 @@ type MockMovieRepository struct {
 	mock.Mock
 }
 
-func (m *MockMovieRepository) Create(movie *models.Movie) error {
+func (m *MockMovieRepository) Create(ctx context.Context, movie *models.Movie) error {
 	args := m.Called(movie)
 	return args.Error(0)
 }
 
-func (m *MockMovieRepository) Update(movie *models.Movie) error {
+func (m *MockMovieRepository) Update(ctx context.Context, movie *models.Movie) error {
 	args := m.Called(movie)
 	return args.Error(0)
+}
+
+func (m *MockMovieRepository) GetMostViewedMovie(ctx context.Context) (*models.Movie, error) {
+	args := m.Called(ctx)
+	if movie, ok := args.Get(0).(*models.Movie); ok {
+		return movie, args.Error(1)
+	}
+	return nil, args.Error(1)
+}
+
+func (m *MockMovieRepository) GetMostViewedGenre(ctx context.Context) (string, int, error) {
+	args := m.Called(ctx)
+	return args.String(0), args.Int(0), args.Error(1)
 }
 
 // TestCreateMovie tests the CreateMovie method of the MovieService.
@@ -34,15 +48,17 @@ func TestCreateMovie(t *testing.T) {
 		Title:       "Test Movie",
 		Description: "A test movie",
 		Duration:    120,
-		Genres:      "Action",
-		WatchURL:    "http://example.com/test.mp4",
+		Genres: []models.Genre{
+			{Name: "Action"},
+		},
+		WatchURL: "http://example.com/test.mp4",
 	}
 
 	// Mock repository behavior
 	mockRepo.On("Create", movie).Return(nil)
 
 	// Call the service method
-	err := service.CreateMovie(movie)
+	err := service.CreateMovie(context.Background(), movie)
 
 	// Assertions
 	assert.Nil(t, err)
@@ -58,15 +74,17 @@ func TestCreateMovie_Fail(t *testing.T) {
 		Title:       "Test Movie",
 		Description: "A test movie",
 		Duration:    120,
-		Genres:      "Action",
-		WatchURL:    "http://example.com/test.mp4",
+		Genres: []models.Genre{
+			{Name: "Action"},
+		},
+		WatchURL: "http://example.com/test.mp4",
 	}
 
 	// Mock repository behavior to return an error
 	mockRepo.On("Create", movie).Return(errors.New("repository error"))
 
 	// Call the service method
-	err := service.CreateMovie(movie)
+	err := service.CreateMovie(context.Background(), movie)
 
 	// Assertions
 	assert.NotNil(t, err)
@@ -84,15 +102,17 @@ func TestUpdateMovie(t *testing.T) {
 		Title:       "Updated Movie",
 		Description: "An updated movie",
 		Duration:    140,
-		Genres:      "Drama",
-		WatchURL:    "http://example.com/updated.mp4",
+		Genres: []models.Genre{
+			{Name: "Drama"},
+		},
+		WatchURL: "http://example.com/updated.mp4",
 	}
 
 	// Mock repository behavior
 	mockRepo.On("Update", movie).Return(nil)
 
 	// Call the service method
-	err := service.UpdateMovie(movie)
+	err := service.UpdateMovie(context.Background(), movie)
 
 	// Assertions
 	assert.Nil(t, err)
@@ -109,15 +129,17 @@ func TestUpdateMovie_Fail(t *testing.T) {
 		Title:       "Updated Movie",
 		Description: "An updated movie",
 		Duration:    140,
-		Genres:      "Drama",
-		WatchURL:    "http://example.com/updated.mp4",
+		Genres: []models.Genre{
+			{Name: "Drama"},
+		},
+		WatchURL: "http://example.com/updated.mp4",
 	}
 
 	// Mock repository behavior to return an error
 	mockRepo.On("Update", movie).Return(errors.New("update failed"))
 
 	// Call the service method
-	err := service.UpdateMovie(movie)
+	err := service.UpdateMovie(context.Background(), movie)
 
 	// Assertions
 	assert.NotNil(t, err)

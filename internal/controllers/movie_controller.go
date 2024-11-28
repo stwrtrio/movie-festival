@@ -1,8 +1,10 @@
 package controllers
 
 import (
+	"fmt"
 	"log"
 	"net/http"
+	"strconv"
 
 	"github.com/stwrtrio/movie-festival/internal/models"
 	"github.com/stwrtrio/movie-festival/internal/services"
@@ -122,4 +124,47 @@ func (c *MovieController) GetMostViewedGenre(ctx echo.Context) error {
 	}
 
 	return utils.SuccessResponse(ctx, http.StatusOK, "", result)
+}
+
+// GetAllMovies handles GET requests to fetch all movies with pagination
+func (c *MovieController) GetAllMovies(ctx echo.Context) error {
+	cx := ctx.Request().Context()
+	// Get pagination parameters
+	limit := 10 // default limit
+	offset := 0 // default offset
+
+	if l := ctx.QueryParam("limit"); l != "" {
+		// Convert the limit from string to int
+		if parsedLimit, err := strconv.Atoi(l); err == nil {
+			limit = parsedLimit
+		}
+	}
+
+	if o := ctx.QueryParam("offset"); o != "" {
+		// Convert the offset from string to int
+		if parsedOffset, err := strconv.Atoi(o); err == nil {
+			offset = parsedOffset
+		}
+	}
+
+	// Check if the `use-cache` flag is set
+	useCache := ctx.QueryParam("use-cache")
+
+	var movies []models.Movie
+	var err error
+
+	// If `use-cache` is "true" or "1", try to fetch data from Redis
+	if useCache == "true" || useCache == "1" {
+		movies, err = c.service.GetAllMoviesFromCache(cx, limit, offset)
+		fmt.Println("err:", err)
+	} else {
+		// Otherwise, fetch from the database
+		movies, err = c.service.GetAllMovies(cx, limit, offset)
+	}
+
+	if err != nil {
+		return utils.FailResponse(ctx, http.StatusInternalServerError, "Unexpected error occurred. Please contact support")
+	}
+
+	return utils.SuccessResponse(ctx, http.StatusOK, "", movies)
 }

@@ -14,6 +14,7 @@ type MovieRepository interface {
 	Update(ctx context.Context, movie *models.Movie) error
 	GetMostViewedMovie(ctx context.Context) (*models.Movie, error)
 	GetMostViewedGenre(ctx context.Context) (string, int, error)
+	GetAllMovies(ctx context.Context, limit, offset int) ([]models.Movie, error)
 }
 
 type movieRepository struct {
@@ -263,4 +264,64 @@ func (r *movieRepository) GetMostViewedGenre(ctx context.Context) (string, int, 
 		return "", 0, err
 	}
 	return genreName, totalViews, nil
+}
+
+func (r *movieRepository) GetAllMovies(ctx context.Context, limit, offset int) ([]models.Movie, error) {
+	// we will set default limit if user not input the limit
+	if limit < 1 {
+		limit = 10
+	}
+
+	query := `
+		SELECT m.id, m.title, m.description, m.duration, m.watch_url, m.views
+		FROM movies m
+		LIMIT ? OFFSET ?
+	`
+	rows, err := r.db.QueryContext(ctx, query, limit, offset)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var movies []models.Movie
+	for rows.Next() {
+		var movie models.Movie
+		err := rows.Scan(
+			&movie.ID,
+			&movie.Title,
+			&movie.Description,
+			&movie.Duration,
+			&movie.WatchURL,
+			&movie.Views,
+		)
+		if err != nil {
+			return nil, err
+		}
+
+		// Fetch genres for the movie
+		genreQuery := `
+			SELECT g.id, g.name
+			FROM genres g
+			JOIN movie_genres mg ON g.id = mg.genre_id
+			WHERE mg.movie_id = ?
+		`
+		genreRows, err := r.db.QueryContext(ctx, genreQuery, movie.ID)
+		if err != nil {
+			return nil, err
+		}
+		defer genreRows.Close()
+
+		for genreRows.Next() {
+			var genre models.Genre
+			err := genreRows.Scan(&genre.ID, &genre.Name)
+			if err != nil {
+				return nil, err
+			}
+			movie.Genres = append(movie.Genres, genre)
+		}
+
+		movies = append(movies, movie)
+	}
+
+	return movies, nil
 }

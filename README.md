@@ -75,3 +75,5 @@ go test ./tests/*
 ```
 go test ./tests/controllers/movie_controller_test.go
 ```
+
+I've attached the Postman collection file to the ```files/doc``` folder for reference. This file contains the API endpoints that can be using for the test.

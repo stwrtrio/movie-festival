@@ -27,13 +27,17 @@ func main() {
 	config.InitDB()
 	defer config.DB.Close()
 
+	// Initialize Redis
+	config.InitRedis()
+	defer config.RedisClient.Close()
+
 	// Initialize Echo
 	e := echo.New()
 	e.Validator = &middlewares.CustomValidator{Validator: validator.New()}
 
 	// Dependency Injection
 	userRepo := repositories.NewMovieRepository(config.DB)
-	userService := services.NewMovieService(userRepo)
+	userService := services.NewMovieService(userRepo, config.RedisClient)
 	userController := controllers.NewMovieController(userService)
 
 	// Register Routes

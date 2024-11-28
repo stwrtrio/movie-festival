@@ -125,6 +125,40 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "get all movies",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/movies?limit=10&offset=0&use-cache=true",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"movies"
+							],
+							"query": [
+								{
+									"key": "limit",
+									"value": "10"
+								},
+								{
+									"key": "offset",
+									"value": "0"
+								},
+								{
+									"key": "use-cache",
+									"value": "true"
+								}
+							]
+						}
+					},
+					"response": []
 				}
 			]
 		}

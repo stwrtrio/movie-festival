@@ -3,6 +3,7 @@ package repositories
 import (
 	"context"
 	"database/sql"
+	"fmt"
 	"log"
 
 	"github.com/google/uuid"
@@ -15,6 +16,7 @@ type MovieRepository interface {
 	GetMostViewedMovie(ctx context.Context) (*models.Movie, error)
 	GetMostViewedGenre(ctx context.Context) (string, int, error)
 	GetAllMovies(ctx context.Context, limit, offset int) ([]models.Movie, error)
+	SearchMovies(ctx context.Context, query string, limit, offset int) ([]models.Movie, error)
 }
 
 type movieRepository struct {
@@ -216,32 +218,12 @@ func (r *movieRepository) GetMostViewedMovie(ctx context.Context) (*models.Movie
 		return nil, err
 	}
 
-	// Query to fetch genres for the movie
-	genreQuery := `
-		SELECT g.id, g.name
-		FROM genres g
-		JOIN movie_genres mg ON g.id = mg.genre_id
-		WHERE mg.movie_id = ?
-	`
-	rows, err := r.db.QueryContext(ctx, genreQuery, movie.ID)
+	// Fetch genres for the movie
+	genreRows, err := r.getGenresByMovieID(ctx, movie.ID)
 	if err != nil {
-		return nil, err
+		log.Fatalf("Error fetching genres: %v", err)
 	}
-	defer rows.Close()
-
-	// Collect genres
-	genres := []models.Genre{}
-	for rows.Next() {
-		var genre models.Genre
-		if err := rows.Scan(&genre.ID, &genre.Name); err != nil {
-			return nil, err
-		}
-
-		genres = append(genres, genre)
-	}
-
-	// Assign genres to the movie model
-	movie.Genres = genres
+	movie.Genres = genreRows
 
 	return &movie, nil
 }
@@ -299,29 +281,84 @@ func (r *movieRepository) GetAllMovies(ctx context.Context, limit, offset int) (
 		}
 
 		// Fetch genres for the movie
-		genreQuery := `
-			SELECT g.id, g.name
-			FROM genres g
-			JOIN movie_genres mg ON g.id = mg.genre_id
-			WHERE mg.movie_id = ?
-		`
-		genreRows, err := r.db.QueryContext(ctx, genreQuery, movie.ID)
+		genreRows, err := r.getGenresByMovieID(ctx, movie.ID)
 		if err != nil {
-			return nil, err
+			log.Fatalf("Error fetching genres: %v", err)
 		}
-		defer genreRows.Close()
-
-		for genreRows.Next() {
-			var genre models.Genre
-			err := genreRows.Scan(&genre.ID, &genre.Name)
-			if err != nil {
-				return nil, err
-			}
-			movie.Genres = append(movie.Genres, genre)
-		}
-
+		movie.Genres = genreRows
 		movies = append(movies, movie)
 	}
 
 	return movies, nil
+}
+
+func (r *movieRepository) SearchMovies(ctx context.Context, query string, limit, offset int) ([]models.Movie, error) {
+	query = "%" + query + "%"
+	queryString := `
+		SELECT DISTINCT m.id, m.title, m.description, m.duration, m.watch_url
+		FROM movies m
+		LEFT JOIN movie_genres mg ON m.id = mg.movie_id
+		LEFT JOIN genres g ON mg.genre_id = g.id
+		LEFT JOIN movie_artists ma ON m.id = ma.movie_id
+		LEFT JOIN artists a ON ma.artist_id = a.id
+		WHERE m.title LIKE ? OR m.description LIKE ? OR g.name LIKE ? OR a.name LIKE ?
+		LIMIT ? OFFSET ?
+	`
+
+	// log.Printf("Executing query: %s\nWith parameters: %v, %v, %v, %v, %d, %d", queryString, query, query, query, query, limit, offset)
+
+	rows, err := r.db.QueryContext(ctx, queryString, query, query, query, query, limit, offset)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var movies []models.Movie
+	for rows.Next() {
+		var movie models.Movie
+		if err := rows.Scan(&movie.ID, &movie.Title, &movie.Description, &movie.Duration, &movie.WatchURL); err != nil {
+			return nil, err
+		}
+
+		// Fetch genres for the movie
+		genreRows, err := r.getGenresByMovieID(ctx, movie.ID)
+		if err != nil {
+			log.Fatalf("Error fetching genres: %v", err)
+		}
+		movie.Genres = genreRows
+		movies = append(movies, movie)
+	}
+
+	return movies, nil
+}
+
+// GetGenresByMovieID retrieves genres associated with a given movie ID.
+func (r *movieRepository) getGenresByMovieID(ctx context.Context, movieID string) ([]models.Genre, error) {
+	query := `
+		SELECT g.id, g.name
+		FROM genres g
+		JOIN movie_genres mg ON g.id = mg.genre_id
+		WHERE mg.movie_id = ?
+	`
+
+	rows, err := r.db.QueryContext(ctx, query, movieID)
+	if err != nil {
+		return nil, fmt.Errorf("failed to execute query: %w", err)
+	}
+	defer rows.Close()
+
+	var genres []models.Genre
+	for rows.Next() {
+		var genre models.Genre
+		if err := rows.Scan(&genre.ID, &genre.Name); err != nil {
+			return nil, fmt.Errorf("failed to scan row: %w", err)
+		}
+		genres = append(genres, genre)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("error iterating rows: %w", err)
+	}
+
+	return genres, nil
 }

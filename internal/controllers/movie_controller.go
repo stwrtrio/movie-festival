@@ -168,3 +168,22 @@ func (c *MovieController) GetAllMovies(ctx echo.Context) error {
 
 	return utils.SuccessResponse(ctx, http.StatusOK, "", movies)
 }
+
+func (c *MovieController) SearchMovies(ctx echo.Context) error {
+	query := ctx.QueryParam("query")
+	limit, err := strconv.Atoi(ctx.QueryParam("limit"))
+	if err != nil || limit <= 0 {
+		limit = 10 // default limit
+	}
+	offset, err := strconv.Atoi(ctx.QueryParam("offset"))
+	if err != nil || offset < 0 {
+		offset = 0 // default offset
+	}
+
+	movies, err := c.service.SearchMovies(ctx.Request().Context(), query, limit, offset)
+	if err != nil {
+		return utils.FailResponse(ctx, http.StatusInternalServerError, "Unexpected error occurred. Please contact support")
+	}
+
+	return utils.SuccessResponse(ctx, http.StatusOK, "", movies)
+}

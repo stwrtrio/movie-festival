@@ -20,6 +20,7 @@ type MovieService interface {
 	GetMostViewedGenre(ctx context.Context) (string, int, error)
 	GetAllMovies(ctx context.Context, limit, offset int) ([]models.Movie, error)
 	GetAllMoviesFromCache(ctx context.Context, limit, offset int) ([]models.Movie, error)
+	SearchMovies(ctx context.Context, query string, limit, offset int) ([]models.Movie, error)
 }
 
 type movieService struct {
@@ -85,4 +86,8 @@ func (s *movieService) GetAllMoviesFromCache(ctx context.Context, limit, offset 
 	}
 
 	return movies, nil
+}
+
+func (s *movieService) SearchMovies(ctx context.Context, query string, limit, offset int) ([]models.Movie, error) {
+	return s.repo.SearchMovies(ctx, query, limit, offset)
 }

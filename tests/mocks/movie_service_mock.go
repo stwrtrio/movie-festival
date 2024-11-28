@@ -51,3 +51,11 @@ func (m *MockMovieService) GetAllMoviesFromCache(ctx context.Context, limit, off
 	}
 	return nil, args.Error(1)
 }
+
+func (m *MockMovieService) SearchMovies(ctx context.Context, query string, limit, offset int) ([]models.Movie, error) {
+	args := m.Called(ctx)
+	if movie, ok := args.Get(0).([]models.Movie); ok {
+		return movie, args.Error(1)
+	}
+	return nil, args.Error(1)
+}

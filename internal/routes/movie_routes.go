@@ -15,4 +15,5 @@ func RegisterMovieRoutes(e *echo.Echo, movieController *controllers.MovieControl
 
 	// Public api
 	e.GET("/api/movies", movieController.GetAllMovies)
+	e.GET("/api/movies/search", movieController.SearchMovies)
 }

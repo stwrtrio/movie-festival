@@ -38,3 +38,10 @@ type GenreView struct {
 	GenreName string `json:"name"`
 	ViewCount int64  `json:"total_views"`
 }
+
+type MovieView struct {
+	MovieID      int       `json:"movie_id"`
+	UserID       int       `json:"user_id,omitempty"`
+	ViewCount    int       `json:"view_count"`
+	LastViewedAt time.Time `json:"last_viewed_at"`
+}

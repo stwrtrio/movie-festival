@@ -194,6 +194,28 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "search movies Copy",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/movies/4183d63a-e51a-4b24-9774-0c7051984071/view",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"movies",
+								"4183d63a-e51a-4b24-9774-0c7051984071",
+								"view"
+							]
+						}
+					},
+					"response": []
 				}
 			]
 		}

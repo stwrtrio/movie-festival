@@ -21,6 +21,7 @@ type MovieService interface {
 	GetAllMovies(ctx context.Context, limit, offset int) ([]models.Movie, error)
 	GetAllMoviesFromCache(ctx context.Context, limit, offset int) ([]models.Movie, error)
 	SearchMovies(ctx context.Context, query string, limit, offset int) ([]models.Movie, error)
+	TrackMovieView(ctx context.Context, movieID string) error
 }
 
 type movieService struct {
@@ -90,4 +91,8 @@ func (s *movieService) GetAllMoviesFromCache(ctx context.Context, limit, offset 
 
 func (s *movieService) SearchMovies(ctx context.Context, query string, limit, offset int) ([]models.Movie, error) {
 	return s.repo.SearchMovies(ctx, query, limit, offset)
+}
+
+func (s *movieService) TrackMovieView(ctx context.Context, movieID string) error {
+	return s.repo.TrackMovieView(ctx, movieID)
 }

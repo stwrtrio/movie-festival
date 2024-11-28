@@ -58,3 +58,8 @@ func (m *MockMovieRepository) SearchMovies(ctx context.Context, query string, li
 	}
 	return nil, args.Error(1)
 }
+
+func (m *MockMovieRepository) TrackMovieView(ctx context.Context, movieID string) error {
+	args := m.Called(ctx, movieID)
+	return args.Error(1)
+}

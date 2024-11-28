@@ -187,3 +187,13 @@ func (c *MovieController) SearchMovies(ctx echo.Context) error {
 
 	return utils.SuccessResponse(ctx, http.StatusOK, "", movies)
 }
+
+func (c *MovieController) TrackMovieView(ctx echo.Context) error {
+	movieID := ctx.Param("id")
+	err := c.service.TrackMovieView(ctx.Request().Context(), movieID)
+	if err != nil {
+		return utils.FailResponse(ctx, http.StatusInternalServerError, "Unexpected error occurred. Please contact support")
+	}
+
+	return utils.SuccessResponse(ctx, http.StatusOK, "Viewership tracked successfully", nil)
+}

@@ -17,6 +17,7 @@ type MovieRepository interface {
 	GetMostViewedGenre(ctx context.Context) (string, int, error)
 	GetAllMovies(ctx context.Context, limit, offset int) ([]models.Movie, error)
 	SearchMovies(ctx context.Context, query string, limit, offset int) ([]models.Movie, error)
+	TrackMovieView(ctx context.Context, movieID string) error
 }
 
 type movieRepository struct {
@@ -361,4 +362,19 @@ func (r *movieRepository) getGenresByMovieID(ctx context.Context, movieID string
 	}
 
 	return genres, nil
+}
+
+func (r *movieRepository) TrackMovieView(ctx context.Context, movieID string) error {
+	query := `
+		INSERT INTO movie_views (movie_id, view_count, last_viewed_at)
+		VALUES (?, 1, NOW())
+		ON DUPLICATE KEY UPDATE 
+			view_count = view_count + 1, 
+			last_viewed_at = NOW()
+	`
+	_, err := r.db.ExecContext(ctx, query, movieID)
+	if err != nil {
+		return err
+	}
+	return nil
 }

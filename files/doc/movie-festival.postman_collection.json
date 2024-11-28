@@ -110,7 +110,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:8080/api/admin/movies/most-viewed",
+							"raw": "http://localhost:8080/api/admin/movies/most-viewed-genre",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -120,7 +120,7 @@
 								"api",
 								"admin",
 								"movies",
-								"most-viewed"
+								"most-viewed-genre"
 							]
 						}
 					},

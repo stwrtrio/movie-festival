@@ -198,3 +198,47 @@ func TestGetAllMoviesFromCache(t *testing.T) {
 
 	mockRepo.AssertExpectations(t)
 }
+
+// TestTrackMovieView
+func TestTrackMovieView(t *testing.T) {
+	type mockBehavior func(repo *mocks.MockMovieRepository, movieID string)
+
+	tests := []struct {
+		name          string
+		movieID       string
+		mockBehavior  mockBehavior
+		expectedError error
+	}{
+		{
+			name:    "Success",
+			movieID: "abc",
+			mockBehavior: func(repo *mocks.MockMovieRepository, movieID string) {
+				repo.On("TrackMovieView", mock.Anything, movieID).Return(nil).Once()
+			},
+			expectedError: nil,
+		},
+		{
+			name:    "Repository Error",
+			movieID: "1",
+			mockBehavior: func(repo *mocks.MockMovieRepository, movieID string) {
+				repo.On("TrackMovieView", mock.Anything, movieID).Return(assert.AnError).Once()
+			},
+			expectedError: assert.AnError,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// Arrange
+			mockRepo := new(mocks.MockMovieRepository)
+			tt.mockBehavior(mockRepo, tt.movieID)
+
+			service := services.NewMovieService(mockRepo, nil)
+
+			err := service.TrackMovieView(context.Background(), tt.movieID)
+
+			assert.Equal(t, tt.expectedError, err)
+			mockRepo.AssertExpectations(t)
+		})
+	}
+}

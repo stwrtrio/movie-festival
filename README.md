@@ -3,23 +3,25 @@
 The Movie Festival API is a backend service for managing movies, genres, artists, and viewing statistics for a movie festival application. It provides endpoints to manage movies, retrieve the most viewed movie and genre, and perform various CRUD operations.
 
 ### Features
-Movies: Create, update, delete, and retrieve movie details including title, description, genres, artists, and viewing statistics.
-Genres: Manage movie genres and associate them with movies.
-Artists: Manage artists involved in movies and associate them with movies.
-Most Viewed: Retrieve the most viewed movie and genre based on view statistics.
+- Movies: Create, update, delete, and retrieve movie details including title, description, genres, artists, and viewing statistics.
+- Genres: Manage movie genres and associate them with movies.
+- Artists: Manage artists involved in movies and associate them with movies.
+- Most Viewed: Retrieve the most viewed movie and genre based on view statistics.
 
 ### Technologies Used
-Golang: The API is built using the Go programming language.
-Echo: A fast and flexible web framework for building APIs.
-MySQL: The API uses MySQL to store movie, genre, artist, and view data.
-SQL Mock: Used for unit testing repository functions with mocked database calls.
-Testify: Testing framework to assert expected behavior during tests.
+- Golang: The API is built using the Go programming language.
+- Echo: A fast and flexible web framework for building APIs.
+- MySQL: The API uses MySQL to store movie, genre, artist, and view data.
+- SQL Mock: Used for unit testing repository functions with mocked database calls.
+- Testify: Testing framework to assert expected behavior during tests.
+- Redis: Used for caching frequently accessed data.
 
 
 ## API Endpoints
 ### Admin APIs
 - GET /api/admin/movies/most-viewed Retrieve most viewed movie.
 - GET /api/admin/movies/most-viewed-genre Retrieve most viewed movie genre.
+- POST /api/movies/:id/view To incrementing the view count for the movie
 - POST /api/admin/movies Create a new movie.
 - POST /api/admin/movies/:id Update an existing movie.
 
@@ -43,7 +45,7 @@ For table structures files is included in directory ``files/sql``
 ### installation
 1. Clone the repository:
 ```
-git clone https://github.com/yourusername/movie-festival.git
+git clone https://github.com/stwrtrio/movie-festival.git
 cd movie-festival
 ```
 

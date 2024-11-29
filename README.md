@@ -66,14 +66,32 @@ DB_NAME=movie_festival
 ```
 4. Run the application:
 ```
-go run main.go
+make run
 ```
+
+### Steps Performed by make run
+1. Linting:
+    - Runs syntax and formatting checks using go vet and go fmt.
+    - Ensures the code adheres to Go best practices and standards.
+2. Testing:
+    - Executes all unit and integration tests in the project using go test.
+    - Confirms that all tests pass without errors.
+3. Running the Application:
+    - If both linting and testing succeed, the application is started using go run.
+
+### Expected Behavior
+- On Success: The application is started after the linting and testing steps pass without errors.
+- On Failure:
+    - If linting fails, the process stops, and an error message is displayed.
+    - If any tests fail, the process stops, and test failure details are displayed.
+
+
 
 ## Testing
 To run tests for the repository and controllers, you can use go test.
 1. Run tests:
 ```
-go test ./tests/*
+make test
 ```
 2. Or you can run tests for a specific file:
 ```

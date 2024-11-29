@@ -58,11 +58,22 @@ go mod tidy
 
 3. Set up the MySQL database. Create a .env file and configure your database connection:
 ```
-DB_HOST=localhost
-DB_PORT=3306
+# Database Connection
 DB_USER=root
-DB_PASSWORD=password
+DB_PASSWORD=
+DB_HOST=127.0.0.1
+DB_PORT=3306
 DB_NAME=movie_festival
+
+# Redis Connection
+REDIS_HOST=localhost
+REDIS_PORT=6379
+REDIS_DB=0
+REDIS_PASSWORD=
+
+# App 
+SERVER_PORT=8080
+CACHE_DEFAULT_EXPIRATION=3600s
 ```
 4. Run the application:
 ```

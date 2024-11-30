@@ -35,7 +35,7 @@ type Artist struct {
 }
 
 type GenreView struct {
-	GenreName string `json:"name"`
+	Name      string `json:"name"`
 	ViewCount int64  `json:"total_views"`
 }
 

@@ -3,10 +3,13 @@ package services
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
+	"log"
 	"os"
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/stwrtrio/movie-festival/internal/models"
 	"github.com/stwrtrio/movie-festival/internal/repositories"
 
@@ -17,7 +20,7 @@ type MovieService interface {
 	CreateMovie(ctx context.Context, movie *models.Movie) error
 	UpdateMovie(ctx context.Context, movie *models.Movie) error
 	GetMostViewedMovie(ctx context.Context) (*models.Movie, error)
-	GetMostViewedGenre(ctx context.Context) (string, int, error)
+	GetMostViewedGenre(ctx context.Context, page int, pageSize int, sortOrder string) ([]models.GenreView, error)
 	GetAllMovies(ctx context.Context, limit, offset int) ([]models.Movie, error)
 	GetAllMoviesFromCache(ctx context.Context, limit, offset int) ([]models.Movie, error)
 	SearchMovies(ctx context.Context, query string, limit, offset int) ([]models.Movie, error)
@@ -34,10 +37,33 @@ func NewMovieService(repo repositories.MovieRepository, redisClient redis.Cmdabl
 }
 
 func (s *movieService) CreateMovie(ctx context.Context, movie *models.Movie) error {
+	movie.ID = uuid.NewString()
+	if len(movie.Artists) < 1 {
+		errMessage := "service CreateMovie err: movie doesn't have artist"
+		log.Println(errMessage)
+		return errors.New(errMessage)
+	}
+
+	for i := range movie.Artists {
+		movie.Artists[i].ID = uuid.NewString()
+	}
 	return s.repo.Create(ctx, movie)
 }
 
 func (s *movieService) UpdateMovie(ctx context.Context, movie *models.Movie) error {
+	// Check movie exist in database
+	movieExist, err := s.repo.FindMovieByID(ctx, movie.ID)
+	if err != nil {
+		log.Println("Service UpdateMovie err:", err)
+		return err
+	}
+
+	if movieExist.ID == "" {
+		err = errors.New("service err: movie is not exists")
+		log.Println("Service UpdateMovie err:", err)
+		return err
+	}
+
 	return s.repo.Update(ctx, movie)
 }
 
@@ -45,8 +71,20 @@ func (s *movieService) GetMostViewedMovie(ctx context.Context) (*models.Movie, e
 	return s.repo.GetMostViewedMovie(ctx)
 }
 
-func (s *movieService) GetMostViewedGenre(ctx context.Context) (string, int, error) {
-	return s.repo.GetMostViewedGenre(ctx)
+func (s *movieService) GetMostViewedGenre(ctx context.Context, page int, pageSize int, sortOrder string) ([]models.GenreView, error) {
+	// Validate sortOrder, default to "DESC" if invalid
+	if sortOrder != "ASC" && sortOrder != "DESC" {
+		sortOrder = "DESC"
+	}
+
+	// Call repository to get most viewed genres
+	genreViews, err := s.repo.GetMostViewedGenre(ctx, page, pageSize, sortOrder)
+	if err != nil {
+		log.Printf("Error fetching most viewed genres: %v", err)
+		return nil, err
+	}
+
+	return genreViews, nil
 }
 
 // GetAllMovies fetches movies from the database

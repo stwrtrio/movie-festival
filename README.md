@@ -20,10 +20,12 @@ The Movie Festival API is a backend service for managing movies, genres, artists
 ## API Endpoints
 ### Admin APIs
 - GET /api/admin/movies/most-viewed Retrieve most viewed movie.
-- GET /api/admin/movies/most-viewed-genre Retrieve most viewed movie genre.
-- POST /api/movies/:id/view To incrementing the view count for the movie
+- GET /api/admin/movies/most-viewed-genres Retrieve most viewed movie genre.
 - POST /api/admin/movies Create a new movie.
 - POST /api/admin/movies/:id Update an existing movie.
+
+### User APIs
+- POST /api/movies/:id/view To incrementing the view count for the movie
 - GET /api/movies/search Search for movies based on their title, description, genres, or artists.
 - GET /api/movies Retrieve a paginated list of movies.
 

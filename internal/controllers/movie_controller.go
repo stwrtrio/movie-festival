@@ -1,7 +1,7 @@
 package controllers
 
 import (
-	"fmt"
+	"errors"
 	"log"
 	"net/http"
 	"strconv"
@@ -54,6 +54,9 @@ func (c *MovieController) CreateMovie(ctx echo.Context) error {
 	}
 
 	if err := c.service.CreateMovie(cx, movie); err != nil {
+		if err == errors.New("service CreateMovie err: movie doesn't have artist") {
+			return utils.SuccessResponse(ctx, http.StatusCreated, "Failed to create movie: movie doesn't have artist", nil)
+		}
 		return utils.FailResponse(ctx, http.StatusInternalServerError, "Failed to create movie")
 	}
 
@@ -74,7 +77,7 @@ func (c *MovieController) UpdateMovie(ctx echo.Context) error {
 
 	// Convert request data to a Movie model
 	genres := make([]models.Genre, 0)
-	for _, genreName := range req.Artists {
+	for _, genreName := range req.Genres {
 		genres = append(genres, models.Genre{Name: string(genreName)})
 	}
 
@@ -112,18 +115,41 @@ func (c *MovieController) GetMostViewedMovie(ctx echo.Context) error {
 }
 
 func (c *MovieController) GetMostViewedGenre(ctx echo.Context) error {
-	cx := ctx.Request().Context()
-	genre, totalViews, err := c.service.GetMostViewedGenre(cx)
+	// Retrieve pagination and sorting parameters from the query string
+	pageStr := ctx.QueryParam("page")
+	pageSizeStr := ctx.QueryParam("page_size")
+	sortOrder := ctx.QueryParam("sort_order")
+
+	// Default values if parameters are not provided
+	if pageStr == "" {
+		pageStr = "1" // default to page 1
+	}
+	if pageSizeStr == "" {
+		pageSizeStr = "10" // default to 10 items per page
+	}
+	if sortOrder == "" {
+		sortOrder = "DESC" // default to descending order
+	}
+
+	// Convert the parameters to integers
+	page, err := strconv.Atoi(pageStr)
+	if err != nil || page <= 0 {
+		return utils.FailResponse(ctx, http.StatusBadRequest, "Invalid page number")
+	}
+
+	pageSize, err := strconv.Atoi(pageSizeStr)
+	if err != nil || pageSize <= 0 {
+		return utils.FailResponse(ctx, http.StatusBadRequest, "Invalid page size")
+	}
+
+	// Call the service to get the most viewed genres
+	genreViews, err := c.service.GetMostViewedGenre(ctx.Request().Context(), page, pageSize, sortOrder)
 	if err != nil {
 		return utils.FailResponse(ctx, http.StatusInternalServerError, "Unexpected error occurred. Please contact support")
 	}
 
-	result := models.GenreView{
-		GenreName: genre,
-		ViewCount: int64(totalViews),
-	}
-
-	return utils.SuccessResponse(ctx, http.StatusOK, "", result)
+	// Return the result
+	return utils.SuccessResponse(ctx, http.StatusOK, "", genreViews)
 }
 
 // GetAllMovies handles GET requests to fetch all movies with pagination
@@ -156,7 +182,6 @@ func (c *MovieController) GetAllMovies(ctx echo.Context) error {
 	// If `use-cache` is "true" or "1", try to fetch data from Redis
 	if useCache == "true" || useCache == "1" {
 		movies, err = c.service.GetAllMoviesFromCache(cx, limit, offset)
-		fmt.Println("err:", err)
 	} else {
 		// Otherwise, fetch from the database
 		movies, err = c.service.GetAllMovies(cx, limit, offset)
@@ -183,6 +208,10 @@ func (c *MovieController) SearchMovies(ctx echo.Context) error {
 	movies, err := c.service.SearchMovies(ctx.Request().Context(), query, limit, offset)
 	if err != nil {
 		return utils.FailResponse(ctx, http.StatusInternalServerError, "Unexpected error occurred. Please contact support")
+	}
+
+	if len(movies) < 1 {
+		movies = []models.Movie{}
 	}
 
 	return utils.SuccessResponse(ctx, http.StatusOK, "", movies)

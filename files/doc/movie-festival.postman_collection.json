@@ -10,7 +10,7 @@
 			"name": "movie",
 			"item": [
 				{
-					"name": "create_movie",
+					"name": "create movie",
 					"request": {
 						"method": "POST",
 						"header": [
@@ -22,7 +22,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"title\": \"Inception\",\n    \"description\": \"A mind-bending thriller\",\n    \"duration\": 148,\n    \"genres\": \"Sci-Fi,Thriller\",\n    \"watch_url\": \"http://example.com/inception.mp4\",\n    \"artists\": [\n        \"Leonardo DiCaprio\",\n        \"Joseph Gordon-Levitt\",\n        \"Elliot Page\"\n    ]\n}",
+							"raw": "{\n    \"title\": \"Inception\",\n    \"description\": \"A mind-bending thriller\",\n    \"duration\": 148,\n    \"genres\": [\"Sci-Fi\",\"Thriller\", \"Action\"],\n    \"watch_url\": \"http://example.com/inception.mp4\",\n    \"artists\": [\n        \"Leonardo DiCaprio\",\n        \"Joseph Gordon-Levitt\",\n        \"Elliot Page\"\n    ]\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -46,7 +46,7 @@
 					"response": []
 				},
 				{
-					"name": "update_movie",
+					"name": "update movie",
 					"request": {
 						"method": "POST",
 						"header": [
@@ -58,7 +58,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"title\": \"Inception\",\n    \"description\": \"A mind-bending thriller\",\n    \"duration\": 150,\n    \"genres\": \"Sci-Fi,Thriller\",\n    \"watch_url\": \"http://example.com/inception.mp4\",\n    \"artists\": [\n        \"Leonardo DiCaprio\",\n        \"Joseph Gordon-Levitt\",\n        \"Elliot Page\"\n    ]\n}",
+							"raw": "{\n    \"title\": \"Inception\",\n    \"description\": \"A mind-bending thriller update\",\n    \"duration\": 150,\n    \"genres\": [\"Sci-Fi\",\"Thriller\"],\n    \"watch_url\": \"http://example.com/inception.mp4\",\n    \"artists\": [\n        \"Leonardo DiCaprio\",\n        \"Joseph Gordon-Levitt\",\n        \"Elliot Page\"\n    ]\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -66,7 +66,7 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:8080/api/admin/movies/6148dd61-1e72-44cf-9bda-4f5fcccbcfc3",
+							"raw": "http://localhost:8080/api/admin/movies/c613353d-2e01-4ab8-ac09-40fb8cc67334",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -76,7 +76,7 @@
 								"api",
 								"admin",
 								"movies",
-								"6148dd61-1e72-44cf-9bda-4f5fcccbcfc3"
+								"c613353d-2e01-4ab8-ac09-40fb8cc67334"
 							]
 						}
 					},
@@ -110,7 +110,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:8080/api/admin/movies/most-viewed-genre",
+							"raw": "http://localhost:8080/api/admin/movies/most-viewed-genres?page=1&page_size=5&sort_order=DESC",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -120,7 +120,21 @@
 								"api",
 								"admin",
 								"movies",
-								"most-viewed-genre"
+								"most-viewed-genres"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "page_size",
+									"value": "5"
+								},
+								{
+									"key": "sort_order",
+									"value": "DESC"
+								}
 							]
 						}
 					},
@@ -201,7 +215,7 @@
 						"method": "POST",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:8080/api/movies/4183d63a-e51a-4b24-9774-0c7051984071/view",
+							"raw": "http://localhost:8080/api/movies/c613353d-2e01-4ab8-ac09-40fb8cc67334/view",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -210,7 +224,7 @@
 							"path": [
 								"api",
 								"movies",
-								"4183d63a-e51a-4b24-9774-0c7051984071",
+								"c613353d-2e01-4ab8-ac09-40fb8cc67334",
 								"view"
 							]
 						}

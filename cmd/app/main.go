@@ -36,12 +36,20 @@ func main() {
 	e.Validator = &middlewares.CustomValidator{Validator: validator.New()}
 
 	// Dependency Injection
-	userRepo := repositories.NewMovieRepository(config.DB)
-	userService := services.NewMovieService(userRepo, config.RedisClient)
-	userController := controllers.NewMovieController(userService)
+	// Repository
+	movieRepo := repositories.NewMovieRepository(config.DB)
+	userRepo := repositories.NewUserRepository(config.DB)
+
+	// Service
+	movieService := services.NewMovieService(movieRepo, config.RedisClient)
+	userService := services.NewUserService(userRepo)
+
+	// Controller
+	movieController := controllers.NewMovieController(movieService)
+	userController := controllers.NewUserController(userService)
 
 	// Register Routes
-	routes.RegisterMovieRoutes(e, userController)
+	routes.RegisterRoutes(e, movieController, userController)
 
 	port := os.Getenv("SERVER_PORT")
 	if port == "" {

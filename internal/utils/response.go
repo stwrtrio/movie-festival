@@ -24,7 +24,7 @@ func SuccessResponse(ctx echo.Context, statusCode int, message string, data inte
 func FailResponse(ctx echo.Context, statusCode int, message string) error {
 	response := JsonResponse{
 		Code:    statusCode,
-		Status:  "fail",
+		Status:  "failed",
 		Message: message,
 	}
 	return ctx.JSON(statusCode, response)

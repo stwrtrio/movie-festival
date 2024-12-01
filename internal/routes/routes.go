@@ -19,5 +19,6 @@ func RegisterRoutes(e *echo.Echo, movieController *controllers.MovieController, 
 	e.POST("/api/movies/:id/view", movieController.TrackMovieView)
 
 	// User api
+	e.POST("/api/user/register", userController.Register)
 	e.POST("/api/user/login", userController.Login)
 }

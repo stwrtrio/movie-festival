@@ -6,11 +6,14 @@ import (
 
 	"golang.org/x/crypto/bcrypt"
 
+	"github.com/google/uuid"
 	"github.com/stwrtrio/movie-festival/internal/helpers"
+	"github.com/stwrtrio/movie-festival/internal/models"
 	"github.com/stwrtrio/movie-festival/internal/repositories"
 )
 
 type UserService interface {
+	Register(ctx context.Context, req models.RegisterRequest) error
 	Login(ctx context.Context, username, password string) (string, error)
 }
 
@@ -20,6 +23,25 @@ type userService struct {
 
 func NewUserService(repo repositories.UserRepository) UserService {
 	return &userService{repo: repo}
+}
+
+func (s *userService) Register(ctx context.Context, req models.RegisterRequest) error {
+	// Check if the username already exists
+	existingUser, _ := s.repo.GetUserByUsername(ctx, req.Username)
+	if existingUser != nil {
+		return errors.New("username already exists")
+	}
+
+	// Create user model
+	user := &models.User{
+		ID:           uuid.NewString(),
+		Username:     req.Username,
+		PasswordHash: req.Password,
+		Role:         "user",
+	}
+
+	// Save user in the repository
+	return s.repo.CreateUser(ctx, user)
 }
 
 func (s *userService) Login(ctx context.Context, username, password string) (string, error) {

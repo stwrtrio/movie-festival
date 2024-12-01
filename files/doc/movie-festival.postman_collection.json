@@ -265,9 +265,39 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "user register",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\": \"user1234\",\n    \"password\": \"password1234\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/user/register",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"user",
+								"register"
+							]
+						}
+					},
+					"response": []
 				}
 			],
-			"description": "#### **1\\. User Login API**\n\n##### **API Endpoint**:\n\n```\nPOST http://localhost:8080/api/user/login\n\n ```\n\n##### **Description**:\n\nThis endpoint allows a user to log in to the system by providing their username and password. If the credentials are valid, a JWT token is generated and returned for authenticated access to protected endpoints.\n\n##### **Request**:\n\n- **Method**: `POST`\n    \n- **URL**: `/api/user/login`\n    \n- **Body (JSON)**:\n    \n\n``` json\n{\n    \"username\": \"user123\",\n    \"password\": \"password123\"\n}\n\n ```\n\n- **Fields**:\n    \n    - `username`: The username of the user trying to log in. (string)\n        \n    - `password`: The password associated with the provided username. (string)\n        \n\n##### **Response**:\n\n- **Success Response** (HTTP 200):\n    \n\n``` json\n{\n    \"code\": 200,\n    \"status\": \"success\",\n    \"message\": \"Access granted\",\n    \"data\": {\n        \"token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNThhYWU5NzgtNDhlOS00YTZhLWJmOWUtN2VkY2E3MDhiYmJkIiwidXNlcm5hbWUiOiJ1c2VyMTIzIiwicm9sZSI6InVzZXIiLCJleHAiOjE3MzMxMjc4Njd9.BcJt29ongfb3bUtObzZCbTtnxoJqDjOXL21aYK15ths\"\n    }\n}\n\n ```\n\n- **Fields**:\n    \n    - `code`: The HTTP status code. (integer)\n        \n    - `status`: The status of the request. (string)\n        \n    - `message`: A message indicating the result of the request. (string)\n        \n    - `data.token`: The JWT token generated for the user to access protected resources. (string)\n        \n- **Failure Response** (HTTP 401):\n    \n\n``` json\n{\n    \"code\": 401,\n    \"status\": \"failed\",\n    \"message\": \"invalid credentials\"\n}\n\n ```\n\n- **Fields**:\n    \n    - `code`: The HTTP status code. (integer)\n        \n    - `status`: The status of the request. (string)\n        \n    - `message`: An error message indicating that the credentials were invalid. (string)\n        \n\n##### **Error Handling**:\n\n- `400 Bad Request`: This error will be returned if the request body is malformed or missing required parameters.\n    \n- `401 Unauthorized`: If the credentials (username or password) are incorrect, this error will be returned."
+			"description": "| HTTP Method | **API Name** | **API Endpoint** |\n| --- | --- | --- |\n| POST | User Register | /api/user/register |\n| POST | User Login | /api/user/login |\n\n#### **1\\. User Register API**\n\n##### **API Endpoint**:\n\n```\nPOST http://localhost:8080/api/user/register\n\n ```\n\n**Description:**  \nAllows a new user to register by providing a username and password.\n\n##### **Request**:\n\n- **Method**: `POST`\n    \n- **URL**: `/api/user/register`\n    \n- **Body (JSON)**:\n    \n\n``` json\n{\n    \"username\": \"user123\",\n    \"password\": \"password123\"\n}\n\n ```\n\n- **Fields**:\n    \n    - `username`: The username of the user trying to log in. (string)\n        \n        - Required\n            \n        - Must be a string\n            \n        - Maximum length: 50 characters\n            \n    - `password`: The password associated with the provided username. (string)\n        \n        - Required\n            \n        - Must be a string\n            \n        - Minimum length: 8 characters\n            \n        - Maximum length: 50 characters\n            \n\n##### **Response**:\n\n- **Success Response** (HTTP 200):\n    \n\n``` json\n{\n    \"code\": 201,\n    \"status\": \"success\",\n    \"message\": \"User registered successfully\"\n}\n\n ```\n\n- **Fields**:\n    \n    - `code`: The HTTP status code. (integer)\n        \n    - `status`: The status of the request. (string)\n        \n    - `message`: A message indicating the result of the request. (string)\n        \n- **Failure Response** (HTTP 400):\n    \n\n``` json\n{\n    \"code\": 400,\n    \"status\": \"failed\",\n    \"message\": \"username already exists\"\n}\n\n ```\n\n- **Fields**:\n    \n    - `code`: The HTTP status code. (integer)\n        \n    - `status`: The status of the request. (string)\n        \n    - `message`: An error message indicating that the credentials were invalid. (string)\n        \n\n##### **Error Handling**:\n\n- `400 Bad Request`: This error will be returned if the request body is malformed or missing required parameters.\n    \n\n#### **2\\. User Login API**\n\n##### **API Endpoint**:\n\n```\nPOST http://localhost:8080/api/user/login\n\n ```\n\n##### **Description**:\n\nThis endpoint allows a user to log in to the system by providing their username and password. If the credentials are valid, a JWT token is generated and returned for authenticated access to protected endpoints.\n\n##### **Request**:\n\n- **Method**: `POST`\n    \n- **URL**: `/api/user/login`\n    \n- **Body (JSON)**:\n    \n\n``` json\n{\n    \"username\": \"user123\",\n    \"password\": \"password123\"\n}\n\n ```\n\n- **Fields**:\n    \n    - `username`: The username of the user trying to log in. (string)\n        \n    - `password`: The password associated with the provided username. (string)\n        \n\n##### **Response**:\n\n- **Success Response** (HTTP 200):\n    \n\n``` json\n{\n    \"code\": 200,\n    \"status\": \"success\",\n    \"message\": \"Access granted\",\n    \"data\": {\n        \"token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNThhYWU5NzgtNDhlOS00YTZhLWJmOWUtN2VkY2E3MDhiYmJkIiwidXNlcm5hbWUiOiJ1c2VyMTIzIiwicm9sZSI6InVzZXIiLCJleHAiOjE3MzMxMjc4Njd9.BcJt29ongfb3bUtObzZCbTtnxoJqDjOXL21aYK15ths\"\n    }\n}\n\n ```\n\n- **Fields**:\n    \n    - `code`: The HTTP status code. (integer)\n        \n    - `status`: The status of the request. (string)\n        \n    - `message`: A message indicating the result of the request. (string)\n        \n    - `data.token`: The JWT token generated for the user to access protected resources. (string)\n        \n- **Failure Response** (HTTP 401):\n    \n\n``` json\n{\n    \"code\": 401,\n    \"status\": \"failed\",\n    \"message\": \"invalid credentials\"\n}\n\n ```\n\n- **Fields**:\n    \n    - `code`: The HTTP status code. (integer)\n        \n    - `status`: The status of the request. (string)\n        \n    - `message`: An error message indicating that the credentials were invalid. (string)\n        \n\n##### **Error Handling**:\n\n- `400 Bad Request`: This error will be returned if the request body is malformed or missing required parameters.\n    \n- `401 Unauthorized`: If the credentials (username or password) are incorrect, this error will be returned."
 		}
 	]
 }

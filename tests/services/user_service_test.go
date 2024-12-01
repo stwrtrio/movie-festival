@@ -14,6 +14,93 @@ import (
 	"github.com/stwrtrio/movie-festival/tests/mocks"
 )
 
+func TestRegister(t *testing.T) {
+	// Define test cases
+	testCases := []struct {
+		name          string
+		request       models.RegisterRequest
+		mockSetup     func(mockRepo *mocks.MockUserRepository)
+		expectedError string
+	}{
+		{
+			name: "Successful registration",
+			request: models.RegisterRequest{
+				Username: "newuser",
+				Password: "securepassword",
+			},
+			mockSetup: func(mockRepo *mocks.MockUserRepository) {
+				// Mock GetUserByUsername to return nil, indicating the username does not exist
+				mockRepo.EXPECT().GetUserByUsername(gomock.Any(), "newuser").Return(nil, nil)
+
+				// Mock CreateUser to succeed
+				mockRepo.EXPECT().CreateUser(gomock.Any(), gomock.Any()).Return(nil)
+			},
+			expectedError: "",
+		},
+		{
+			name: "Username already exists",
+			request: models.RegisterRequest{
+				Username: "existinguser",
+				Password: "securepassword",
+			},
+			mockSetup: func(mockRepo *mocks.MockUserRepository) {
+				// Mock GetUserByUsername to return an existing user
+				mockRepo.EXPECT().GetUserByUsername(gomock.Any(), "existinguser").Return(&models.User{
+					ID:           uuid.NewString(),
+					Username:     "existinguser",
+					PasswordHash: "hashedpassword",
+					Role:         "user",
+				}, nil)
+			},
+			expectedError: "username already exists",
+		},
+		{
+			name: "Repository error on CreateUser",
+			request: models.RegisterRequest{
+				Username: "newuser",
+				Password: "securepassword",
+			},
+			mockSetup: func(mockRepo *mocks.MockUserRepository) {
+				// Mock GetUserByUsername to return nil
+				mockRepo.EXPECT().GetUserByUsername(gomock.Any(), "newuser").Return(nil, nil)
+
+				// Mock CreateUser to return an error
+				mockRepo.EXPECT().CreateUser(gomock.Any(), gomock.Any()).Return(errors.New("repository error"))
+			},
+			expectedError: "repository error",
+		},
+	}
+
+	// Iterate through test cases
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			// Create a mock controller
+			ctrl := gomock.NewController(t)
+			defer ctrl.Finish()
+
+			// Create a mock repository
+			mockRepo := mocks.NewMockUserRepository(ctrl)
+
+			// Set up mock behavior
+			tc.mockSetup(mockRepo)
+
+			// Create the service
+			userService := services.NewUserService(mockRepo)
+
+			// Call the service method
+			err := userService.Register(context.Background(), tc.request)
+
+			// Validate results
+			if tc.expectedError != "" {
+				assert.Error(t, err)
+				assert.Contains(t, err.Error(), tc.expectedError)
+			} else {
+				assert.NoError(t, err)
+			}
+		})
+	}
+}
+
 func TestUserLogin(t *testing.T) {
 	// Test cases
 	testCases := []struct {

@@ -14,7 +14,9 @@ The Movie Festival API is a backend service for managing movies, genres, artists
 - MySQL: The API uses MySQL to store movie, genre, artist, and view data.
 - SQL Mock: Used for unit testing repository functions with mocked database calls.
 - Testify: Testing framework to assert expected behavior during tests.
+- GoMock: For mocking the repository in unit tests.
 - Redis: Used for caching frequently accessed data.
+- JWT: Tokens are securely signed using a secret key to prevent tampering.
 
 
 ## API Endpoints
@@ -28,6 +30,8 @@ The Movie Festival API is a backend service for managing movies, genres, artists
 - POST /api/movies/:id/view To incrementing the view count for the movie
 - GET /api/movies/search Search for movies based on their title, description, genres, or artists.
 - GET /api/movies Retrieve a paginated list of movies.
+- POST /api/user/register to register user
+- POST /api/user/login to login user
 
 ## Database Schema
 ### Tables
@@ -99,7 +103,6 @@ make run
     - If any tests fail, the process stops, and test failure details are displayed.
 
 
-
 ## Testing
 To run tests for the repository and controllers, you can use go test.
 1. Run tests:
@@ -111,4 +114,4 @@ make test
 go test ./tests/controllers/movie_controller_test.go
 ```
 
-I've attached the Postman collection file to the ```files/doc``` folder for reference. This file contains the API endpoints that can be using for the test.
+I've attached the Postman collection file to the ```files/doc``` folder for reference. This file contains the API endpoints that can be using for the test. Just import that file to your postman

@@ -13,7 +13,12 @@ type User struct {
 	UpdatedAt    time.Time `json:"updated_at"`
 }
 
-type UserLoginRequest struct {
+type LoginRequest struct {
 	Username string `json:"username" validate:"required"`
 	Password string `json:"password" validate:"required"`
+}
+
+type RegisterRequest struct {
+	Username string `json:"username" validate:"required,min=3,max=50"`
+	Password string `json:"password" validate:"required,min=6,max=50"`
 }

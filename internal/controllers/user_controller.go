@@ -18,8 +18,25 @@ func NewUserController(service services.UserService) *UserController {
 	return &UserController{service}
 }
 
+func (c *UserController) Register(ctx echo.Context) error {
+	cx := ctx.Request().Context()
+	var req models.RegisterRequest
+	if err := ctx.Bind(&req); err != nil {
+		return utils.FailResponse(ctx, http.StatusBadRequest, "Invalid request body")
+	}
+
+	if err := c.service.Register(cx, req); err != nil {
+		if err.Error() == "username already exists" {
+			return utils.FailResponse(ctx, http.StatusConflict, err.Error())
+		}
+		return utils.FailResponse(ctx, http.StatusInternalServerError, "internal server error")
+	}
+
+	return utils.SuccessResponse(ctx, http.StatusCreated, "user registered successfully", nil)
+}
+
 func (c *UserController) Login(ctx echo.Context) error {
-	var userRequest models.UserLoginRequest
+	var userRequest models.LoginRequest
 
 	cx := ctx.Request().Context()
 

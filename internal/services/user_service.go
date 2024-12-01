@@ -3,7 +3,6 @@ package services
 import (
 	"context"
 	"errors"
-	"fmt"
 
 	"golang.org/x/crypto/bcrypt"
 
@@ -31,10 +30,6 @@ func (s *userService) Login(ctx context.Context, username, password string) (str
 	if user == nil {
 		return "", errors.New("invalid credentials")
 	}
-
-	fmt.Println("here---")
-	fmt.Println("user hash: ", user.PasswordHash)
-	fmt.Println("user pass: ", password)
 
 	// Compare hashed passwords
 	if err := bcrypt.CompareHashAndPassword([]byte(user.PasswordHash), []byte(password)); err != nil {

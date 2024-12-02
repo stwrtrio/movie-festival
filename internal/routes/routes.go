@@ -4,6 +4,7 @@ import (
 	"github.com/labstack/echo/v4"
 
 	"github.com/stwrtrio/movie-festival/internal/controllers"
+	"github.com/stwrtrio/movie-festival/internal/middlewares"
 )
 
 func RegisterRoutes(e *echo.Echo, movieController *controllers.MovieController, userController *controllers.UserController) {
@@ -21,4 +22,9 @@ func RegisterRoutes(e *echo.Echo, movieController *controllers.MovieController, 
 	// User api
 	e.POST("/api/user/register", userController.Register)
 	e.POST("/api/user/login", userController.Login)
+
+	// Protected routes
+	protected := e.Group("")
+	protected.Use(middlewares.AuthMiddleware)
+	protected.POST("/api/user/logout", userController.Logout)
 }

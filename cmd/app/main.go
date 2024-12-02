@@ -42,7 +42,7 @@ func main() {
 
 	// Service
 	movieService := services.NewMovieService(movieRepo, config.RedisClient)
-	userService := services.NewUserService(userRepo)
+	userService := services.NewUserService(userRepo, config.RedisClient)
 
 	// Controller
 	movieController := controllers.NewMovieController(movieService)

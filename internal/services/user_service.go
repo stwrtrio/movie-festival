@@ -3,7 +3,9 @@ package services
 import (
 	"context"
 	"errors"
+	"time"
 
+	"github.com/go-redis/redis/v8"
 	"golang.org/x/crypto/bcrypt"
 
 	"github.com/google/uuid"
@@ -15,14 +17,16 @@ import (
 type UserService interface {
 	Register(ctx context.Context, req models.RegisterRequest) error
 	Login(ctx context.Context, username, password string) (string, error)
+	Logout(ctx context.Context, claims *helpers.Claims) error
 }
 
 type userService struct {
-	repo repositories.UserRepository
+	repo  repositories.UserRepository
+	redis redis.Cmdable
 }
 
-func NewUserService(repo repositories.UserRepository) UserService {
-	return &userService{repo: repo}
+func NewUserService(repo repositories.UserRepository, redisClient redis.Cmdable) UserService {
+	return &userService{repo: repo, redis: redisClient}
 }
 
 func (s *userService) Register(ctx context.Context, req models.RegisterRequest) error {
@@ -65,4 +69,17 @@ func (s *userService) Login(ctx context.Context, username, password string) (str
 	}
 
 	return token, nil
+}
+
+func (s *userService) Logout(ctx context.Context, claims *helpers.Claims) error {
+	// Calculate the token's remaining TTL
+	ttl := time.Until(claims.ExpiresAt.Time)
+
+	// Add token JTI to Redis blacklist
+	err := s.redis.Set(ctx, claims.JTI, "true", ttl).Err()
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

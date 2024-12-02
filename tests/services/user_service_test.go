@@ -3,16 +3,31 @@ package services_test
 import (
 	"context"
 	"errors"
+	"log"
+	"os"
 	"testing"
 
+	"github.com/go-redis/redismock/v8"
 	"github.com/golang/mock/gomock"
 	"github.com/google/uuid"
+	"github.com/joho/godotenv"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/stwrtrio/movie-festival/internal/models"
 	"github.com/stwrtrio/movie-festival/internal/services"
 	"github.com/stwrtrio/movie-festival/tests/mocks"
 )
+
+func TestMain(m *testing.M) {
+	// Load .env file
+	if err := godotenv.Load("../../.env"); err != nil {
+		log.Fatalf("Error loading .env file: %v", err)
+	}
+
+	// Run tests
+	code := m.Run()
+	os.Exit(code)
+}
 
 func TestRegister(t *testing.T) {
 	// Define test cases
@@ -84,8 +99,11 @@ func TestRegister(t *testing.T) {
 			// Set up mock behavior
 			tc.mockSetup(mockRepo)
 
+			// Mock Redis client
+			mockRedisClient, _ := redismock.NewClientMock()
+
 			// Create the service
-			userService := services.NewUserService(mockRepo)
+			userService := services.NewUserService(mockRepo, mockRedisClient)
 
 			// Call the service method
 			err := userService.Register(context.Background(), tc.request)
@@ -200,8 +218,11 @@ func TestUserLogin(t *testing.T) {
 			// Setup the mock behavior for the current test case
 			tc.mockSetup(mockRepo)
 
+			// Mock Redis client
+			mockRedisClient, _ := redismock.NewClientMock()
+
 			// Create the service
-			userService := services.NewUserService(mockRepo)
+			userService := services.NewUserService(mockRepo, mockRedisClient)
 
 			// Call the service method
 			token, err := userService.Login(context.Background(), tc.username, tc.password)

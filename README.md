@@ -32,6 +32,7 @@ The Movie Festival API is a backend service for managing movies, genres, artists
 - GET /api/movies Retrieve a paginated list of movies.
 - POST /api/user/register to register user
 - POST /api/user/login to login user
+- POST /api/user/logout to logout user
 
 ## Database Schema
 ### Tables

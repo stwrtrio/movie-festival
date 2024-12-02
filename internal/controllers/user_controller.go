@@ -3,6 +3,7 @@ package controllers
 import (
 	"net/http"
 
+	"github.com/stwrtrio/movie-festival/internal/middlewares"
 	"github.com/stwrtrio/movie-festival/internal/models"
 	"github.com/stwrtrio/movie-festival/internal/services"
 	"github.com/stwrtrio/movie-festival/internal/utils"
@@ -54,4 +55,20 @@ func (c *UserController) Login(ctx echo.Context) error {
 	}
 
 	return utils.SuccessResponse(ctx, http.StatusOK, "Access granted", map[string]string{"token": token})
+}
+
+func (c *UserController) Logout(ctx echo.Context) error {
+	cx := ctx.Request().Context()
+	// Retrieve user claims from context
+	claims, ok := middlewares.GetUserFromContext(ctx)
+	if !ok {
+		return utils.FailResponse(ctx, http.StatusUnauthorized, "User not authenticated")
+	}
+
+	err := c.service.Logout(cx, claims)
+	if err != nil {
+		return utils.FailResponse(ctx, http.StatusInternalServerError, "internal server error")
+	}
+
+	return utils.SuccessResponse(ctx, http.StatusOK, "user logged out successfully", nil)
 }

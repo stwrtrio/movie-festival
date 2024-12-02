@@ -8,23 +8,25 @@ import (
 )
 
 func RegisterRoutes(e *echo.Echo, movieController *controllers.MovieController, userController *controllers.UserController) {
-	// Admin api
-	e.POST("/api/admin/movies", movieController.CreateMovie)
-	e.POST("/api/admin/movies/:id", movieController.UpdateMovie)
-	e.GET("/api/admin/movies/most-viewed", movieController.GetMostViewedMovie)
-	e.GET("/api/admin/movies/most-viewed-genres", movieController.GetMostViewedGenre)
 
-	// Public api
-	e.GET("/api/movies", movieController.GetAllMovies)
-	e.GET("/api/movies/search", movieController.SearchMovies)
-	e.POST("/api/movies/:id/view", movieController.TrackMovieView)
-
-	// User api
+	// Public routes (no authentication required)
 	e.POST("/api/user/register", userController.Register)
 	e.POST("/api/user/login", userController.Login)
 
-	// Protected routes
-	protected := e.Group("")
-	protected.Use(middlewares.AuthMiddleware)
-	protected.POST("/api/user/logout", userController.Logout)
+	e.POST("/api/movies/:id/view", movieController.TrackMovieView)
+	e.GET("/api/movies", movieController.GetAllMovies)
+	e.GET("/api/movies/search", movieController.SearchMovies)
+
+	// Authenticated user routes
+	userGroup := e.Group("/api/user")
+	userGroup.Use(middlewares.AuthMiddleware)
+	userGroup.POST("/logout", userController.Logout)
+
+	// Admin routes
+	adminGroup := e.Group("/api/admin")
+	adminGroup.Use(middlewares.AdminAuthMiddleware)
+	adminGroup.POST("/movies", movieController.CreateMovie)
+	adminGroup.POST("/movies/:id", movieController.UpdateMovie)
+	adminGroup.GET("/movies/most-viewed", movieController.GetMostViewedMovie)
+	adminGroup.GET("/movies/most-viewed-genres", movieController.GetMostViewedGenre)
 }

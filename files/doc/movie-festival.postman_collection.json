@@ -216,6 +216,35 @@
 					"response": []
 				},
 				{
+					"name": "unvote movie",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNThhYWU5NzgtNDhlOS00YTZhLWJmOWUtN2VkY2E3MDhiYmJkIiwidXNlcm5hbWUiOiJ1c2VyMTIzIiwicm9sZSI6InVzZXIiLCJqdGkiOiIyMzE3OGM1NC0wMmMwLTQyZDYtOTk0Zi1iMGQzMTk1NTg2N2IiLCJleHAiOjE3MzMzMzExNDAsImlhdCI6MTczMzI0NDc0MH0.fWZnovYT6ma70x8454qt43QaOGX8e_JX1MuPF26xrVY",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:8080/api/user/movies/c613353d-2e01-4ab8-ac09-40fb8cc67334/unvote",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"user",
+								"movies",
+								"c613353d-2e01-4ab8-ac09-40fb8cc67334",
+								"unvote"
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "search movies",
 					"request": {
 						"method": "GET",

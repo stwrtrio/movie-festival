@@ -26,6 +26,7 @@ type MovieService interface {
 	SearchMovies(ctx context.Context, query string, limit, offset int) ([]models.Movie, error)
 	TrackMovieView(ctx context.Context, movieID string) error
 	VoteMovie(ctx context.Context, userID, movieID string) error
+	UnvoteMovie(ctx context.Context, userID, movieID string) error
 }
 
 type movieService struct {
@@ -142,7 +143,7 @@ func (s *movieService) VoteMovie(ctx context.Context, userID, movieID string) er
 	if err != nil {
 		return err
 	}
-	if existingVote != nil {
+	if existingVote.ID == "" {
 		return errors.New("you have already voted for this movie")
 	}
 
@@ -151,4 +152,18 @@ func (s *movieService) VoteMovie(ctx context.Context, userID, movieID string) er
 		return err
 	}
 	return nil
+}
+
+func (s *movieService) UnvoteMovie(ctx context.Context, userID, movieID string) error {
+	// Check if the vote exists
+	existingVote, err := s.repo.GetVoteByUserAndMovie(ctx, userID, movieID)
+	if err != nil {
+		return err
+	}
+	if existingVote.ID == "" {
+		return errors.New("you haven't voted for this movie yet")
+	}
+
+	// Remove the vote
+	return s.repo.DeleteVote(ctx, existingVote.ID)
 }

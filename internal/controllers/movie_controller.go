@@ -255,3 +255,31 @@ func (c *MovieController) VoteMovie(ctx echo.Context) error {
 	// Success response
 	return utils.SuccessResponse(ctx, http.StatusOK, "Movie voted successfully", nil)
 }
+
+func (c *MovieController) UnvoteMovie(ctx echo.Context) error {
+	cx := ctx.Request().Context()
+
+	// Get user claims from context
+	claims, ok := middlewares.GetUserFromContext(ctx)
+	if !ok {
+		return utils.FailResponse(ctx, http.StatusUnauthorized, "User not authenticated")
+	}
+	userID := claims.UserID
+
+	// Extract the movie ID from the request parameters
+	movieID := ctx.Param("id")
+	if movieID == "" {
+		return utils.FailResponse(ctx, http.StatusBadRequest, "Movie ID is required")
+	}
+
+	// Call the service to unvote the movie
+	err := c.service.UnvoteMovie(cx, userID, movieID)
+	if err != nil {
+		if err == errors.New("you haven't voted for this movie yet") {
+			return utils.FailResponse(ctx, http.StatusBadRequest, err.Error())
+		}
+		return utils.FailResponse(ctx, http.StatusInternalServerError, "Failed to unvote for movie")
+	}
+
+	return utils.SuccessResponse(ctx, http.StatusOK, "Movie unvoted successfully", nil)
+}

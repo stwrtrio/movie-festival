@@ -652,3 +652,83 @@ func TestTrackMovieViewService(t *testing.T) {
 		})
 	}
 }
+
+func TestUnvoteMovie(t *testing.T) {
+	// Define test cases
+	testCases := []struct {
+		name        string
+		userID      string
+		movieID     string
+		mockSetup   func(repo *mocks.MockMovieRepository)
+		expectedErr error
+	}{
+		{
+			name:    "Success Case",
+			userID:  "test-user-id",
+			movieID: "test-movie-id",
+			mockSetup: func(repo *mocks.MockMovieRepository) {
+				// Setup for checking if the vote exists
+				repo.EXPECT().
+					GetVoteByUserAndMovie(context.Background(), "test-user-id", "test-movie-id").
+					Return(&models.Vote{ID: "test-vote-id"}, nil)
+
+				repo.EXPECT().
+					DeleteVote(context.Background(), "test-vote-id").Return(nil)
+			},
+			expectedErr: nil,
+		},
+		{
+			name:    "Vote Not Found",
+			userID:  "test-user-id",
+			movieID: "test-movie-id",
+			mockSetup: func(repo *mocks.MockMovieRepository) {
+				// Setup for vote not existing
+				repo.EXPECT().
+					GetVoteByUserAndMovie(context.Background(), "test-user-id", "test-movie-id").Return(&models.Vote{}, nil)
+			},
+			expectedErr: errors.New("you haven't voted for this movie yet"),
+		},
+		{
+			name:    "Repository Error",
+			userID:  "test-user-id",
+			movieID: "test-movie-id",
+			mockSetup: func(repo *mocks.MockMovieRepository) {
+				// Setup for checking if the vote exists
+				repo.EXPECT().
+					GetVoteByUserAndMovie(context.Background(), "test-user-id", "test-movie-id").
+					Return(&models.Vote{ID: "test-vote-id"}, nil)
+
+				repo.EXPECT().
+					DeleteVote(context.Background(), "test-vote-id").Return(errors.New("repository error"))
+			},
+			expectedErr: errors.New("repository error"),
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			// Initialize mock controller
+			ctrl := gomock.NewController(t)
+			defer ctrl.Finish()
+
+			// Mock dependencies
+			mockRepo := mocks.NewMockMovieRepository(ctrl)
+
+			// Setup mocks based on test case
+			tc.mockSetup(mockRepo)
+
+			// Initialize service
+			movieService := services.NewMovieService(mockRepo, nil)
+
+			// Act
+			err := movieService.UnvoteMovie(context.Background(), tc.userID, tc.movieID)
+
+			// Assert
+			if tc.expectedErr == nil {
+				assert.NoError(t, err)
+			} else {
+				assert.EqualError(t, err, tc.expectedErr.Error())
+			}
+		})
+	}
+}

@@ -23,6 +23,7 @@ type MovieRepository interface {
 	FindArtistByMovieID(ctx context.Context, movieID string) (models.Artist, error)
 	GetVoteByUserAndMovie(ctx context.Context, userID, movieID string) (*models.Vote, error)
 	CreateVote(ctx context.Context, userID, movieID string) error
+	DeleteVote(ctx context.Context, voteID string) error
 }
 
 type movieRepository struct {
@@ -503,10 +504,10 @@ func (r *movieRepository) GetVoteByUserAndMovie(ctx context.Context, userID, mov
 	query := "SELECT id, user_id, movie_id FROM votes WHERE user_id = ? AND movie_id = ?"
 	err := r.db.QueryRowContext(ctx, query, userID, movieID).Scan(&vote.ID, &vote.UserID, &vote.MovieID)
 	if err == sql.ErrNoRows {
-		return nil, nil
+		return &vote, nil
 	}
 	if err != nil {
-		return nil, err
+		return &vote, err
 	}
 	return &vote, nil
 }
@@ -515,5 +516,11 @@ func (r *movieRepository) GetVoteByUserAndMovie(ctx context.Context, userID, mov
 func (r *movieRepository) CreateVote(ctx context.Context, userID, movieID string) error {
 	query := "INSERT INTO votes (id, user_id, movie_id) VALUES (?, ?, ?)"
 	_, err := r.db.ExecContext(ctx, query, uuid.NewString(), userID, movieID)
+	return err
+}
+
+func (r *movieRepository) DeleteVote(ctx context.Context, voteID string) error {
+	query := "DELETE FROM votes WHERE id = ?"
+	_, err := r.db.ExecContext(ctx, query, voteID)
 	return err
 }

@@ -22,6 +22,7 @@ func RegisterRoutes(e *echo.Echo, movieController *controllers.MovieController, 
 	userGroup.Use(middlewares.AuthMiddleware)
 	userGroup.POST("/logout", userController.Logout)
 	userGroup.POST("/movies/:id/vote", movieController.VoteMovie)
+	userGroup.POST("/movies/:id/unvote", movieController.UnvoteMovie)
 
 	// Admin routes
 	adminGroup := e.Group("/api/admin")

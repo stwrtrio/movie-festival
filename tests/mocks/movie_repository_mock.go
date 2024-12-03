@@ -63,6 +63,20 @@ func (mr *MockMovieRepositoryMockRecorder) CreateVote(ctx, userID, movieID inter
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateVote", reflect.TypeOf((*MockMovieRepository)(nil).CreateVote), ctx, userID, movieID)
 }
 
+// DeleteVote mocks base method.
+func (m *MockMovieRepository) DeleteVote(ctx context.Context, voteID string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DeleteVote", ctx, voteID)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// DeleteVote indicates an expected call of DeleteVote.
+func (mr *MockMovieRepositoryMockRecorder) DeleteVote(ctx, voteID interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteVote", reflect.TypeOf((*MockMovieRepository)(nil).DeleteVote), ctx, voteID)
+}
+
 // FindArtistByMovieID mocks base method.
 func (m *MockMovieRepository) FindArtistByMovieID(ctx context.Context, movieID string) (models.Artist, error) {
 	m.ctrl.T.Helper()

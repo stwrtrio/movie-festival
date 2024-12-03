@@ -298,3 +298,105 @@ func TestGetMostViewedMovie(t *testing.T) {
 	_, err = testDB.Exec("DELETE FROM movie_views WHERE movie_id = ?", movieID)
 	require.NoError(t, err)
 }
+
+func TestUnvoteMovie(t *testing.T) {
+	// Create a new repository instance with the test database
+	repo := repositories.NewMovieRepository(testDB)
+	ctx := context.Background()
+
+	// Create Movie Dummy Data
+	movie, err := createMovieDummyData()
+	assert.NoError(t, err)
+
+	// Create User Dummy Data
+	user, err := createUserDummy()
+	assert.NoError(t, err)
+
+	// Arrange: Insert a vote
+	vote := models.Vote{
+		ID:      "test-vote-id",
+		UserID:  user.ID,
+		MovieID: movie.ID,
+	}
+	_, err = testDB.Exec("INSERT INTO votes (id, user_id, movie_id) VALUES (?, ?, ?)", vote.ID, vote.UserID, vote.MovieID)
+	assert.NoError(t, err, "Failed to insert vote for testing")
+
+	// Verify the vote was inserted
+	var voteResult models.Vote
+	row := testDB.QueryRow("SELECT id FROM votes WHERE id = ?", vote.ID)
+	err = row.Scan(&voteResult.ID)
+	assert.NoError(t, err)
+	assert.Equal(t, vote.ID, voteResult.ID)
+
+	// Act: Call UnvoteMovie
+	err = repo.DeleteVote(ctx, vote.ID)
+	assert.NoError(t, err, "UnvoteMovie failed")
+
+	// Assert: Check the vote is removed
+	var count int
+	err = testDB.QueryRow("SELECT COUNT(*) FROM votes WHERE id = ?", vote.ID).Scan(&count)
+	assert.NoError(t, err, "Failed to query votes")
+	assert.Equal(t, 0, count, "Vote should have been removed")
+
+	// Clean up test data from the database
+	err = cleanDummyData(movie)
+	require.NoError(t, err)
+
+	deleteQuery := "DELETE FROM users WHERE id = ?"
+	_, err = testDB.Exec(deleteQuery, user.ID)
+	assert.NoError(t, err, "Error cleaning up inserted user data")
+}
+
+func createMovieDummyData() (*models.Movie, error) {
+	// Create a new repository instance with the test database
+	repo := repositories.NewMovieRepository(testDB)
+
+	// Test data
+	movieID := uuid.NewString()
+	movie := &models.Movie{
+		ID:          movieID,
+		Title:       "Test Movie",
+		Description: "A great movie",
+		Duration:    120,
+		WatchURL:    "http://example.com/movie.mp4",
+		Genres: []models.Genre{
+			{ID: 1, Name: "Action"},
+			{ID: 2, Name: "Thriller"},
+		},
+	}
+
+	// Insert dummy data into the database
+	err := repo.Create(context.Background(), movie)
+	if err != nil {
+		return &models.Movie{}, err
+	}
+
+	// Verify the movie was inserted
+	var res models.Movie
+	row := testDB.QueryRow("SELECT id FROM movies WHERE id = ?", movie.ID)
+	err = row.Scan(&res.ID)
+	if err != nil {
+		return &models.Movie{}, err
+	}
+
+	return movie, nil
+}
+
+func createUserDummy() (*models.User, error) {
+	// Create dummy user data
+	user := &models.User{
+		ID:           uuid.NewString(),
+		Username:     "usertestdummy",
+		PasswordHash: "$2a$10$7zOGb5S4F0TAMvuIEXJxH.yGjkoQ2I6ES4.l8P0e.mXJaX5aiRlYS",
+		Role:         "user",
+	}
+
+	// Insert dummy data into the 'users' table
+	insertQuery := "INSERT INTO users (id,username, password_hash, role) VALUES (?, ?, ?, ?)"
+	_, err := testDB.Exec(insertQuery, user.ID, user.Username, user.PasswordHash, user.Role)
+	if err != nil {
+		return &models.User{}, err
+	}
+
+	return user, nil
+}

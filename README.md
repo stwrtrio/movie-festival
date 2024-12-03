@@ -33,6 +33,7 @@ The Movie Festival API is a backend service for managing movies, genres, artists
 - POST /api/user/register to register user
 - POST /api/user/login to login user
 - POST /api/user/logout to logout user
+- POST /api/user/movie/:id/vote to vote movie by movie id
 
 ## Database Schema
 ### Tables
@@ -42,6 +43,7 @@ The Movie Festival API is a backend service for managing movies, genres, artists
 - movie_genres: Junction table to associate movies with genres.
 - movie_artists: Junction table to associate movies with artists.
 - movie_views: Stores the view count for each movie.
+- votes: Stores the movie voted by user.
 
 For table structures files is included in directory ``files/sql``
 
@@ -81,6 +83,10 @@ REDIS_PASSWORD=
 # App 
 SERVER_PORT=8080
 CACHE_DEFAULT_EXPIRATION=3600s
+
+#JWT
+JWT_SECRET=replace_this
+JWT_EXPIRY=24h
 ```
 4. Run the application:
 ```

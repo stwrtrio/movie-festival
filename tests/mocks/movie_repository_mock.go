@@ -49,6 +49,20 @@ func (mr *MockMovieRepositoryMockRecorder) Create(ctx, movie interface{}) *gomoc
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Create", reflect.TypeOf((*MockMovieRepository)(nil).Create), ctx, movie)
 }
 
+// CreateVote mocks base method.
+func (m *MockMovieRepository) CreateVote(ctx context.Context, userID, movieID string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CreateVote", ctx, userID, movieID)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// CreateVote indicates an expected call of CreateVote.
+func (mr *MockMovieRepositoryMockRecorder) CreateVote(ctx, userID, movieID interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateVote", reflect.TypeOf((*MockMovieRepository)(nil).CreateVote), ctx, userID, movieID)
+}
+
 // FindArtistByMovieID mocks base method.
 func (m *MockMovieRepository) FindArtistByMovieID(ctx context.Context, movieID string) (models.Artist, error) {
 	m.ctrl.T.Helper()
@@ -137,6 +151,21 @@ func (m *MockMovieRepository) GetMostViewedMovie(ctx context.Context) (*models.M
 func (mr *MockMovieRepositoryMockRecorder) GetMostViewedMovie(ctx interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetMostViewedMovie", reflect.TypeOf((*MockMovieRepository)(nil).GetMostViewedMovie), ctx)
+}
+
+// GetVoteByUserAndMovie mocks base method.
+func (m *MockMovieRepository) GetVoteByUserAndMovie(ctx context.Context, userID, movieID string) (*models.Vote, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetVoteByUserAndMovie", ctx, userID, movieID)
+	ret0, _ := ret[0].(*models.Vote)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetVoteByUserAndMovie indicates an expected call of GetVoteByUserAndMovie.
+func (mr *MockMovieRepositoryMockRecorder) GetVoteByUserAndMovie(ctx, userID, movieID interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetVoteByUserAndMovie", reflect.TypeOf((*MockMovieRepository)(nil).GetVoteByUserAndMovie), ctx, userID, movieID)
 }
 
 // SearchMovies mocks base method.

@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/stwrtrio/movie-festival/internal/middlewares"
 	"github.com/stwrtrio/movie-festival/internal/models"
 	"github.com/stwrtrio/movie-festival/internal/services"
 	"github.com/stwrtrio/movie-festival/internal/utils"
@@ -225,4 +226,32 @@ func (c *MovieController) TrackMovieView(ctx echo.Context) error {
 	}
 
 	return utils.SuccessResponse(ctx, http.StatusOK, "Viewership tracked successfully", nil)
+}
+
+func (c *MovieController) VoteMovie(ctx echo.Context) error {
+	cx := ctx.Request().Context()
+	// Get user claims from context
+	claims, ok := middlewares.GetUserFromContext(ctx)
+	if !ok {
+		return utils.FailResponse(ctx, http.StatusUnauthorized, "User not authenticated")
+	}
+	userID := claims.UserID
+
+	// Get movie ID from the URL
+	movieID := ctx.Param("id")
+	if movieID == "" {
+		return utils.FailResponse(ctx, http.StatusBadRequest, "Movie ID is required")
+	}
+
+	// Call the service to vote for the movie
+	err := c.service.VoteMovie(cx, userID, movieID)
+	if err != nil {
+		if err == errors.New("you have already voted for this movie") {
+			return utils.FailResponse(ctx, http.StatusBadRequest, err.Error())
+		}
+		return utils.FailResponse(ctx, http.StatusInternalServerError, "Failed to vote for movie")
+	}
+
+	// Success response
+	return utils.SuccessResponse(ctx, http.StatusOK, "Movie voted successfully", nil)
 }

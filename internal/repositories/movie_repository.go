@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 
+	"github.com/google/uuid"
 	"github.com/stwrtrio/movie-festival/internal/models"
 )
 
@@ -20,6 +21,8 @@ type MovieRepository interface {
 	FindMovieByID(ctx context.Context, movieID string) (models.Movie, error)
 	FindGenreByMovieID(ctx context.Context, movieID string) (models.Genre, error)
 	FindArtistByMovieID(ctx context.Context, movieID string) (models.Artist, error)
+	GetVoteByUserAndMovie(ctx context.Context, userID, movieID string) (*models.Vote, error)
+	CreateVote(ctx context.Context, userID, movieID string) error
 }
 
 type movieRepository struct {
@@ -492,4 +495,25 @@ func (r *movieRepository) TrackMovieView(ctx context.Context, movieID string) er
 		return err
 	}
 	return nil
+}
+
+// GetVoteByUserAndMovie checks if a user has already voted for a specific movie
+func (r *movieRepository) GetVoteByUserAndMovie(ctx context.Context, userID, movieID string) (*models.Vote, error) {
+	var vote models.Vote
+	query := "SELECT id, user_id, movie_id FROM votes WHERE user_id = ? AND movie_id = ?"
+	err := r.db.QueryRowContext(ctx, query, userID, movieID).Scan(&vote.ID, &vote.UserID, &vote.MovieID)
+	if err == sql.ErrNoRows {
+		return nil, nil
+	}
+	if err != nil {
+		return nil, err
+	}
+	return &vote, nil
+}
+
+// CreateVote inserts a new vote into the database
+func (r *movieRepository) CreateVote(ctx context.Context, userID, movieID string) error {
+	query := "INSERT INTO votes (id, user_id, movie_id) VALUES (?, ?, ?)"
+	_, err := r.db.ExecContext(ctx, query, uuid.NewString(), userID, movieID)
+	return err
 }

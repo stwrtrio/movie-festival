@@ -45,3 +45,10 @@ type MovieView struct {
 	ViewCount    int       `json:"view_count"`
 	LastViewedAt time.Time `json:"last_viewed_at"`
 }
+
+type Vote struct {
+	ID        string    `json:"id"`
+	UserID    string    `json:"user_id"`
+	MovieID   string    `json:"movie_id"`
+	CreatedAt time.Time `json:"created_at"`
+}

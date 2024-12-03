@@ -108,7 +108,13 @@
 					"name": "get most view genre",
 					"request": {
 						"method": "GET",
-						"header": [],
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNThhYWU5NzgtNDhlOS00YTZhLWJmOWUtN2VkY2E3MDhiYmJkIiwidXNlcm5hbWUiOiJ1c2VyMTIzIiwicm9sZSI6InVzZXIiLCJqdGkiOiJhZGM5OTE5Zi1lMGE5LTRlNDAtOWYyNC1kZmI2Mjk2NDBlYzEiLCJleHAiOjE3MzMyNTI2NDAsImlhdCI6MTczMzE2NjI0MH0.cfC5HJSHz5wRIHiyPgJeqVhFlQnV0L_c9rNaq4395ek",
+								"type": "text"
+							}
+						],
 						"url": {
 							"raw": "http://localhost:8080/api/admin/movies/most-viewed-genres?page=1&page_size=5&sort_order=DESC",
 							"protocol": "http",
@@ -144,7 +150,13 @@
 					"name": "get all movies",
 					"request": {
 						"method": "GET",
-						"header": [],
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNThhYWU5NzgtNDhlOS00YTZhLWJmOWUtN2VkY2E3MDhiYmJkIiwidXNlcm5hbWUiOiJ1c2VyMTIzIiwicm9sZSI6InVzZXIiLCJqdGkiOiJhZGM5OTE5Zi1lMGE5LTRlNDAtOWYyNC1kZmI2Mjk2NDBlYzEiLCJleHAiOjE3MzMyNTI2NDAsImlhdCI6MTczMzE2NjI0MH0.cfC5HJSHz5wRIHiyPgJeqVhFlQnV0L_c9rNaq4395ek",
+								"type": "text"
+							}
+						],
 						"url": {
 							"raw": "http://localhost:8080/api/movies?limit=10&offset=0&use-cache=true",
 							"protocol": "http",
@@ -169,6 +181,35 @@
 									"key": "use-cache",
 									"value": "true"
 								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "vote movie",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNThhYWU5NzgtNDhlOS00YTZhLWJmOWUtN2VkY2E3MDhiYmJkIiwidXNlcm5hbWUiOiJ1c2VyMTIzIiwicm9sZSI6InVzZXIiLCJqdGkiOiIyMTUyZTU5MC1kMWIwLTQyMjYtOGM2Ny02YmVjZWFmMzdiZjciLCJleHAiOjE3MzMyNjk2NTYsImlhdCI6MTczMzE4MzI1Nn0.67a2dK1JkgBQRVokxp1JUTBQ1RDvNvv_ftBqjyEIalo",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:8080/api/user/movies/c613353d-2e01-4ab8-ac09-40fb8cc67334/vote",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"user",
+								"movies",
+								"c613353d-2e01-4ab8-ac09-40fb8cc67334",
+								"vote"
 							]
 						}
 					},
@@ -273,7 +314,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"username\": \"user1234\",\n    \"password\": \"password1234\"\n}",
+							"raw": "{\n    \"username\": \"admin1\",\n    \"password\": \"password123\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -325,6 +366,12 @@
 				}
 			],
 			"description": "| HTTP Method | **API Name** | **API Endpoint** |\n| --- | --- | --- |\n| POST | User Register | /api/user/register |\n| POST | User Login | /api/user/login |\n| POST | User Logout | /api/user/logout |\n\n---\n\n#### **1\\. User Register API**\n\n##### **API Endpoint**:\n\n```\nPOST http://localhost:8080/api/user/register\n\n ```\n\n**Description:**  \nAllows a new user to register by providing a username and password.\n\n##### **Request**:\n\n- **Method**: `POST`\n    \n- **URL**: `/api/user/register`\n    \n- **Body (JSON)**:\n    \n\n``` json\n{\n    \"username\": \"user123\",\n    \"password\": \"password123\"\n}\n\n ```\n\n- **Fields**:\n    \n    - `username`: The username of the user trying to log in. (string)\n        \n        - Required\n            \n        - Must be a string\n            \n        - Maximum length: 50 characters\n            \n    - `password`: The password associated with the provided username. (string)\n        \n        - Required\n            \n        - Must be a string\n            \n        - Minimum length: 8 characters\n            \n        - Maximum length: 50 characters\n            \n\n##### **Response**:\n\n- **Success Response** (HTTP 200):\n    \n\n``` json\n{\n    \"code\": 201,\n    \"status\": \"success\",\n    \"message\": \"User registered successfully\"\n}\n\n ```\n\n- **Fields**:\n    \n    - `code`: The HTTP status code. (integer)\n        \n    - `status`: The status of the request. (string)\n        \n    - `message`: A message indicating the result of the request. (string)\n        \n- **Failure Response** (HTTP 400):\n    \n\n``` json\n{\n    \"code\": 400,\n    \"status\": \"failed\",\n    \"message\": \"username already exists\"\n}\n\n ```\n\n- **Fields**:\n    \n    - `code`: The HTTP status code. (integer)\n        \n    - `status`: The status of the request. (string)\n        \n    - `message`: An error message indicating that the credentials were invalid. (string)\n        \n\n##### **Error Handling**:\n\n- `400 Bad Request`: This error will be returned if the request body is malformed or missing required parameters.\n    \n\n---\n\n#### **2\\. User Login API**\n\n##### **API Endpoint**:\n\n```\nPOST http://localhost:8080/api/user/login\n\n ```\n\n##### **Description**:\n\nThis endpoint allows a user to log in to the system by providing their username and password. If the credentials are valid, a JWT token is generated and returned for authenticated access to protected endpoints.\n\n##### **Request**:\n\n- **Method**: `POST`\n    \n- **URL**: `/api/user/login`\n    \n- **Body (JSON)**:\n    \n\n``` json\n{\n    \"username\": \"user123\",\n    \"password\": \"password123\"\n}\n\n ```\n\n- **Fields**:\n    \n    - `username`: The username of the user trying to log in. (string)\n        \n    - `password`: The password associated with the provided username. (string)\n        \n\n##### **Response**:\n\n- **Success Response** (HTTP 200):\n    \n\n``` json\n{\n    \"code\": 200,\n    \"status\": \"success\",\n    \"message\": \"Access granted\",\n    \"data\": {\n        \"token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNThhYWU5NzgtNDhlOS00YTZhLWJmOWUtN2VkY2E3MDhiYmJkIiwidXNlcm5hbWUiOiJ1c2VyMTIzIiwicm9sZSI6InVzZXIiLCJleHAiOjE3MzMxMjc4Njd9.BcJt29ongfb3bUtObzZCbTtnxoJqDjOXL21aYK15ths\"\n    }\n}\n\n ```\n\n- **Fields**:\n    \n    - `code`: The HTTP status code. (integer)\n        \n    - `status`: The status of the request. (string)\n        \n    - `message`: A message indicating the result of the request. (string)\n        \n    - `data.token`: The JWT token generated for the user to access protected resources. (string)\n        \n- **Failure Response** (HTTP 401):\n    \n\n``` json\n{\n    \"code\": 401,\n    \"status\": \"failed\",\n    \"message\": \"invalid credentials\"\n}\n\n ```\n\n- **Fields**:\n    \n    - `code`: The HTTP status code. (integer)\n        \n    - `status`: The status of the request. (string)\n        \n    - `message`: An error message indicating that the credentials were invalid. (string)\n        \n\n##### **Error Handling**:\n\n- `400 Bad Request`: This error will be returned if the request body is malformed or missing required parameters.\n    \n- `401 Unauthorized`: If the credentials (username or password) are incorrect, this error will be returned.\n    \n\n---\n\n#### **3\\. User Logout API**\n\n##### **API Endpoint**:\n\n```\nPOST http://localhost:8080/api/user/logout\n\n ```\n\n#### **Description:**\n\nThis endpoint allows a user to log out from the system by invalidating their JWT token. Upon logout, the token will be added to the blacklist in Redis to prevent further use.\n\n##### **Request**:\n\n- **Method**: `POST`\n    \n- **URL**: `/api/user/logout`\n    \n\nThere is no request body required for this endpoint. The authentication token should be passed via the `Authorization` header.\n\n#### **Request Header:**\n\n- **Authorization**: Required. The value should be the Bearer token, which is the JWT token previously generated during login.\n    \n    Example:\n    \n\n``` bash\nAuthorization: Bearer <your-jwt-token>\n\n ```\n\n#### **Response Success:**\n\n- **Status Code:** `200 OK`\n    \n- **Response Body:**\n    \n\n``` json\n{\n    \"code\": 200,\n    \"status\": \"success\",\n    \"message\": \"user logged out successfully\"\n}\n\n ```\n\n**Fields:**\n\n- **code**: HTTP status code of the response (200).\n    \n- **status**: The status of the request (success).\n    \n- **message**: A message confirming that the logout was successful.\n    \n\n#### **Response Failure:**\n\n- **Status Code:** `401 Unauthorized` (if the JWT token is invalid or not provided)\n    \n- **Response Body:**\n    \n\n``` json\n{\n    \"code\": 401,\n    \"status\": \"failed\",\n    \"message\": \"Token has been revoked\"\n}\n\n ```\n\n**Fields:**\n\n- **code**: HTTP status code of the response (401).\n    \n- **status**: The status of the request (failed).\n    \n- **message**: A message indicating that the token is invalid or missing."
+		}
+	],
+	"variable": [
+		{
+			"key": "movie_id",
+			"value": ":id"
 		}
 	]
 }

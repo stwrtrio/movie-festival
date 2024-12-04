@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
+	"strings"
 
 	"github.com/google/uuid"
 	"github.com/stwrtrio/movie-festival/internal/models"
@@ -24,6 +25,8 @@ type MovieRepository interface {
 	GetVoteByUserAndMovie(ctx context.Context, userID, movieID string) (*models.Vote, error)
 	CreateVote(ctx context.Context, userID, movieID string) error
 	DeleteVote(ctx context.Context, voteID string) error
+	GetMoviesByIDs(ctx context.Context, movieIDs []string) ([]models.Movie, error)
+	GetUserVotedMovieIDs(ctx context.Context, userID string) ([]string, error)
 }
 
 type movieRepository struct {
@@ -523,4 +526,63 @@ func (r *movieRepository) DeleteVote(ctx context.Context, voteID string) error {
 	query := "DELETE FROM votes WHERE id = ?"
 	_, err := r.db.ExecContext(ctx, query, voteID)
 	return err
+}
+
+// GetMoviesByIDs retrieves the details of movies by their IDs.
+func (r *movieRepository) GetMoviesByIDs(ctx context.Context, movieIDs []string) ([]models.Movie, error) {
+	// Construct the placeholders for the query
+	placeholders := make([]string, len(movieIDs))
+	args := make([]interface{}, len(movieIDs))
+	for i, id := range movieIDs {
+		placeholders[i] = "?"
+		args[i] = id
+	}
+
+	// Build the query dynamically
+	query := fmt.Sprintf("SELECT id, title FROM movies WHERE id IN (%s)", strings.Join(placeholders, ","))
+
+	// Prepare and execute the query
+	rows, err := r.db.QueryContext(ctx, query, args...)
+	if err != nil {
+		return nil, fmt.Errorf("failed to execute query: %w", err)
+	}
+	defer rows.Close()
+
+	// Parse the result
+	var movies []models.Movie
+	for rows.Next() {
+		var movie models.Movie
+		if err := rows.Scan(&movie.ID, &movie.Title); err != nil {
+			return nil, fmt.Errorf("failed to scan row: %w", err)
+		}
+		movies = append(movies, movie)
+	}
+
+	// Check for errors during iteration
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("row iteration error: %w", err)
+	}
+
+	return movies, nil
+}
+
+// GetUserVotedMovieIDs retrieves the list of movie IDs the user has voted for.
+func (r *movieRepository) GetUserVotedMovieIDs(ctx context.Context, userID string) ([]string, error) {
+	query := "SELECT movie_id FROM votes WHERE user_id = ?"
+	rows, err := r.db.QueryContext(ctx, query, userID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var movieIDs []string
+	for rows.Next() {
+		var movieID string
+		if err := rows.Scan(&movieID); err != nil {
+			return nil, err
+		}
+		movieIDs = append(movieIDs, movieID)
+	}
+
+	return movieIDs, nil
 }

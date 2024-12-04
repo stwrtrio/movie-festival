@@ -27,6 +27,7 @@ type MovieService interface {
 	TrackMovieView(ctx context.Context, movieID string) error
 	VoteMovie(ctx context.Context, userID, movieID string) error
 	UnvoteMovie(ctx context.Context, userID, movieID string) error
+	GetUserVotedMovies(ctx context.Context, userID string) ([]models.Movie, error)
 }
 
 type movieService struct {
@@ -54,15 +55,7 @@ func (s *movieService) CreateMovie(ctx context.Context, movie *models.Movie) err
 
 func (s *movieService) UpdateMovie(ctx context.Context, movie *models.Movie) error {
 	// Check movie exist in database
-	movieExist, err := s.repo.FindMovieByID(ctx, movie.ID)
-	if err != nil {
-		log.Println("Service UpdateMovie err:", err)
-		return err
-	}
-
-	if movieExist.ID == "" {
-		err = errors.New("service err: movie is not exists")
-		log.Println("Service UpdateMovie err:", err)
+	if _, err := s.repo.FindMovieByID(ctx, movie.ID); err != nil {
 		return err
 	}
 
@@ -166,4 +159,26 @@ func (s *movieService) UnvoteMovie(ctx context.Context, userID, movieID string) 
 
 	// Remove the vote
 	return s.repo.DeleteVote(ctx, existingVote.ID)
+}
+
+// GetUserVotedMovies retrieves the list of movies the user has voted for.
+func (s *movieService) GetUserVotedMovies(ctx context.Context, userID string) ([]models.Movie, error) {
+	// Fetch the list of voted movie IDs from the repository
+	votedMovieIDs, err := s.repo.GetUserVotedMovieIDs(ctx, userID)
+	if err != nil {
+		return nil, err
+	}
+
+	// If no votes found, return an empty list
+	if len(votedMovieIDs) == 0 {
+		return []models.Movie{}, nil
+	}
+
+	// Fetch movie details for the IDs
+	votedMovies, err := s.repo.GetMoviesByIDs(ctx, votedMovieIDs)
+	if err != nil {
+		return nil, err
+	}
+
+	return votedMovies, nil
 }

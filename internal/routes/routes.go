@@ -23,12 +23,13 @@ func RegisterRoutes(e *echo.Echo, movieController *controllers.MovieController, 
 	userGroup.POST("/logout", userController.Logout)
 	userGroup.POST("/movies/:id/vote", movieController.VoteMovie)
 	userGroup.POST("/movies/:id/unvote", movieController.UnvoteMovie)
+	userGroup.GET("/votes", movieController.GetUserVotesController)
 
 	// Admin routes
 	adminGroup := e.Group("/api/admin")
 	adminGroup.Use(middlewares.AdminAuthMiddleware)
-	adminGroup.POST("/movies", movieController.CreateMovie)
-	adminGroup.POST("/movies/:id", movieController.UpdateMovie)
+	adminGroup.POST("/movie", movieController.CreateMovie)
+	adminGroup.POST("/movie/:id", movieController.UpdateMovie)
 	adminGroup.GET("/movies/most-viewed", movieController.GetMostViewedMovie)
 	adminGroup.GET("/movies/most-viewed-genres", movieController.GetMostViewedGenre)
 }

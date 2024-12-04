@@ -167,6 +167,36 @@ func (mr *MockMovieRepositoryMockRecorder) GetMostViewedMovie(ctx interface{}) *
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetMostViewedMovie", reflect.TypeOf((*MockMovieRepository)(nil).GetMostViewedMovie), ctx)
 }
 
+// GetMoviesByIDs mocks base method.
+func (m *MockMovieRepository) GetMoviesByIDs(ctx context.Context, movieIDs []string) ([]models.Movie, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetMoviesByIDs", ctx, movieIDs)
+	ret0, _ := ret[0].([]models.Movie)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetMoviesByIDs indicates an expected call of GetMoviesByIDs.
+func (mr *MockMovieRepositoryMockRecorder) GetMoviesByIDs(ctx, movieIDs interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetMoviesByIDs", reflect.TypeOf((*MockMovieRepository)(nil).GetMoviesByIDs), ctx, movieIDs)
+}
+
+// GetUserVotedMovieIDs mocks base method.
+func (m *MockMovieRepository) GetUserVotedMovieIDs(ctx context.Context, userID string) ([]string, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetUserVotedMovieIDs", ctx, userID)
+	ret0, _ := ret[0].([]string)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetUserVotedMovieIDs indicates an expected call of GetUserVotedMovieIDs.
+func (mr *MockMovieRepositoryMockRecorder) GetUserVotedMovieIDs(ctx, userID interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUserVotedMovieIDs", reflect.TypeOf((*MockMovieRepository)(nil).GetUserVotedMovieIDs), ctx, userID)
+}
+
 // GetVoteByUserAndMovie mocks base method.
 func (m *MockMovieRepository) GetVoteByUserAndMovie(ctx context.Context, userID, movieID string) (*models.Vote, error) {
 	m.ctrl.T.Helper()

@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"database/sql"
 	"errors"
 	"log"
 	"net/http"
@@ -98,7 +99,12 @@ func (c *MovieController) UpdateMovie(ctx echo.Context) error {
 		Artists:     artists,
 	}
 
-	if err := c.service.UpdateMovie(cx, movie); err != nil {
+	err := c.service.UpdateMovie(cx, movie)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return utils.FailResponse(ctx, http.StatusBadRequest, "movie is not exists")
+		}
+
 		return utils.FailResponse(ctx, http.StatusInternalServerError, "Unexpected error occurred. Please contact support")
 	}
 
@@ -282,4 +288,24 @@ func (c *MovieController) UnvoteMovie(ctx echo.Context) error {
 	}
 
 	return utils.SuccessResponse(ctx, http.StatusOK, "Movie unvoted successfully", nil)
+}
+
+// GetUserVotesController handles fetching the list of voted movies for a user.
+func (c *MovieController) GetUserVotesController(ctx echo.Context) error {
+	cx := ctx.Request().Context()
+
+	// Get user claims from context
+	claims, ok := middlewares.GetUserFromContext(ctx)
+	if !ok {
+		return utils.FailResponse(ctx, http.StatusUnauthorized, "User not authenticated")
+	}
+	userID := claims.UserID
+
+	// Call the service to get the voted movies
+	votedMovies, err := c.service.GetUserVotedMovies(cx, userID)
+	if err != nil {
+		return utils.FailResponse(ctx, http.StatusInternalServerError, "Failed to fetch voted movies")
+	}
+
+	return utils.SuccessResponse(ctx, http.StatusOK, "Voted movies retrieved successfully", votedMovies)
 }

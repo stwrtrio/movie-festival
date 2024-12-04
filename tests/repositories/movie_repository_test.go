@@ -80,7 +80,6 @@ func cleanDummyData(movie *models.Movie) error {
 	}
 
 	for _, artist := range movie.Artists {
-		fmt.Println("artist_id:", artist.ID)
 		_, err = testDB.Exec("DELETE FROM artists WHERE id = ?", artist.ID)
 		if err != nil {
 			return err
@@ -88,7 +87,6 @@ func cleanDummyData(movie *models.Movie) error {
 	}
 
 	for _, genre := range movie.Genres {
-		fmt.Println("genre_id:", genre.ID)
 		_, err = testDB.Exec("DELETE FROM genres WHERE id = ?", genre.ID)
 		if err != nil {
 			return err
@@ -100,36 +98,9 @@ func cleanDummyData(movie *models.Movie) error {
 
 // TestCreateMovie_Success
 func TestCreateMovie(t *testing.T) {
-	// Create the repository
-	repo := repositories.NewMovieRepository(testDB)
-
-	// Create dummy data
-	movie := &models.Movie{
-		ID:          uuid.NewString(),
-		Title:       "Test Movie",
-		Description: "A test movie description",
-		Duration:    120,
-		WatchURL:    "http://example.com",
-		Views:       0,
-		Genres: []models.Genre{
-			{Name: "Action"},
-			{Name: "Adventure"},
-		},
-		Artists: []models.Artist{
-			{ID: uuid.NewString(), Name: "John Doe"},
-			{ID: uuid.NewString(), Name: "Jane Smith"},
-		},
-	}
-
-	// Insert dummy data into the database
-	err := repo.Create(context.Background(), movie)
-	require.NoError(t, err)
-
-	// Verify that the movie was created in the database
-	var movieID string
-	err = testDB.QueryRow("SELECT id FROM movies WHERE title = ?", movie.Title).Scan(&movieID)
-	require.NoError(t, err)
-	assert.NotEmpty(t, movieID)
+	// Create Movie Dummy Data
+	movie, err := createMovieDummyData()
+	assert.NoError(t, err)
 
 	// Verify the genres were inserted and linked correctly
 	for _, genre := range movie.Genres {
@@ -140,7 +111,7 @@ func TestCreateMovie(t *testing.T) {
 
 		// Verify the movie_genres link
 		var movieGenreCount int
-		err = testDB.QueryRow("SELECT COUNT(*) FROM movie_genres WHERE movie_id = ? AND genre_id = ?", movieID, genreID).Scan(&movieGenreCount)
+		err = testDB.QueryRow("SELECT COUNT(*) FROM movie_genres WHERE movie_id = ? AND genre_id = ?", movie.ID, genreID).Scan(&movieGenreCount)
 		require.NoError(t, err)
 		assert.Equal(t, 1, movieGenreCount)
 	}
@@ -154,7 +125,7 @@ func TestCreateMovie(t *testing.T) {
 
 		// Verify the movie_artists link
 		var movieArtistCount int
-		err = testDB.QueryRow("SELECT COUNT(*) FROM movie_artists WHERE movie_id = ? AND artist_id = ?", movieID, artistID).Scan(&movieArtistCount)
+		err = testDB.QueryRow("SELECT COUNT(*) FROM movie_artists WHERE movie_id = ? AND artist_id = ?", movie.ID, artistID).Scan(&movieArtistCount)
 		require.NoError(t, err)
 		assert.Equal(t, 1, movieArtistCount)
 	}
@@ -168,34 +139,9 @@ func TestCreateMovie(t *testing.T) {
 func TestUpdateMovie_Success(t *testing.T) {
 	repo := repositories.NewMovieRepository(testDB)
 
-	// Create dummy data to insert
-	movie := &models.Movie{
-		ID:          uuid.NewString(),
-		Title:       "Test Movie",
-		Description: "A test movie description",
-		Duration:    120,
-		WatchURL:    "http://example.com",
-		Views:       0,
-		Genres: []models.Genre{
-			{Name: "Action"},
-			{Name: "Adventure"},
-		},
-		Artists: []models.Artist{
-			{ID: uuid.NewString(), Name: "John Doe"},
-			{ID: uuid.NewString(), Name: "Jane Smith"},
-		},
-	}
-
-	// Insert dummy data into the database
-	err := repo.Create(context.Background(), movie)
-	require.NoError(t, err)
-
-	// Verify the movie was updated correctly
-	var result models.Movie
-	row := testDB.QueryRow("SELECT title FROM movies WHERE title = ?", movie.Title)
-	err = row.Scan(&result.Title)
+	// Create Movie Dummy Data
+	movie, err := createMovieDummyData()
 	assert.NoError(t, err)
-	assert.Equal(t, movie.Title, result.Title)
 
 	// Update dummy data
 	movie.Title = "Test Movie Update"
@@ -248,22 +194,7 @@ func TestGetMostViewedMovie(t *testing.T) {
 	// Create a new repository instance with the test database
 	repo := repositories.NewMovieRepository(testDB)
 
-	// Test data
-	movieID := uuid.NewString()
-	movie := &models.Movie{
-		ID:          movieID,
-		Title:       "Test Movie",
-		Description: "A great movie",
-		Duration:    120,
-		WatchURL:    "http://example.com/movie.mp4",
-		Genres: []models.Genre{
-			{ID: 1, Name: "Action"},
-			{ID: 2, Name: "Thriller"},
-		},
-	}
-
-	// Insert dummy data into the database
-	err := repo.Create(context.Background(), movie)
+	movie, err := createMovieDummyData()
 	assert.NoError(t, err)
 
 	// Verify the movie was inserted
@@ -277,7 +208,7 @@ func TestGetMostViewedMovie(t *testing.T) {
 	_, err = testDB.Exec(`
 		INSERT INTO movie_views (movie_id, view_count, last_viewed_at)
 		VALUES (?, 5000, NOW())
-	`, movieID)
+	`, movie.ID)
 	if err != nil {
 		t.Fatalf("failed to insert test data: %v", err)
 		assert.NoError(t, err)
@@ -295,7 +226,7 @@ func TestGetMostViewedMovie(t *testing.T) {
 	err = cleanDummyData(movie)
 	require.NoError(t, err)
 
-	_, err = testDB.Exec("DELETE FROM movie_views WHERE movie_id = ?", movieID)
+	_, err = testDB.Exec("DELETE FROM movie_views WHERE movie_id = ?", movie.ID)
 	require.NoError(t, err)
 }
 
@@ -342,6 +273,85 @@ func TestUnvoteMovie(t *testing.T) {
 	err = cleanDummyData(movie)
 	require.NoError(t, err)
 
+	deleteQuery := "DELETE FROM users WHERE id = ?"
+	_, err = testDB.Exec(deleteQuery, user.ID)
+	assert.NoError(t, err, "Error cleaning up inserted user data")
+}
+
+func TestGetMoviesByIDs(t *testing.T) {
+	ctx := context.Background()
+	repo := repositories.NewMovieRepository(testDB)
+
+	// Create Movie Dummy Data
+	movie, err := createMovieDummyData()
+	assert.NoError(t, err)
+
+	t.Run("Valid IDs", func(t *testing.T) {
+		movieIDs := []string{movie.ID}
+		movies, err := repo.GetMoviesByIDs(ctx, movieIDs)
+
+		assert.NoError(t, err, "Unexpected error")
+		assert.Len(t, movies, 1)
+		assert.Equal(t, "Test Movie", movies[0].Title)
+	})
+
+	t.Run("Invalid IDs", func(t *testing.T) {
+		movieIDs := []string{"invalid-id1"}
+		movies, err := repo.GetMoviesByIDs(ctx, movieIDs)
+
+		assert.NoError(t, err, "Unexpected error")
+		assert.Empty(t, movies)
+	})
+
+	// Clean up test data
+	err = cleanDummyData(movie)
+	assert.NoError(t, err)
+}
+
+func TestGetUserVotedMovieIDs(t *testing.T) {
+	ctx := context.Background()
+
+	// Create Movie Dummy Data
+	movie, err := createMovieDummyData()
+	assert.NoError(t, err)
+
+	// Create User Dummy Data
+	user, err := createUserDummy()
+	assert.NoError(t, err)
+
+	voteID := uuid.NewString()
+
+	// Insert test data
+	_, err = testDB.Exec(`INSERT INTO votes (id, user_id, movie_id) VALUES (?, ?, ?)`, voteID, user.ID, movie.ID)
+	assert.NoError(t, err, "Failed to insert vote test data")
+
+	repo := repositories.NewMovieRepository(testDB)
+
+	t.Run("Valid User", func(t *testing.T) {
+		votedMovieIDs, err := repo.GetUserVotedMovieIDs(ctx, user.ID)
+
+		assert.NoError(t, err, "Unexpected error")
+		assert.Len(t, votedMovieIDs, 1)
+		assert.ElementsMatch(t, []string{movie.ID}, votedMovieIDs)
+	})
+
+	t.Run("Invalid User", func(t *testing.T) {
+		userID := "invalid_user"
+		votedMovieIDs, err := repo.GetUserVotedMovieIDs(ctx, userID)
+
+		assert.NoError(t, err, "Unexpected error")
+		assert.Empty(t, votedMovieIDs)
+	})
+
+	// Clean up vote test data
+	_, _ = testDB.Exec(`DELETE FROM votes WHERE user_id = ?`, user.ID)
+	assert.NoError(t, err, "Error cleaning up inserted vote data")
+
+	// Clean up test data from the database
+	err = cleanDummyData(movie)
+	require.NoError(t, err)
+
+	// Clean up user test data
 	deleteQuery := "DELETE FROM users WHERE id = ?"
 	_, err = testDB.Exec(deleteQuery, user.ID)
 	assert.NoError(t, err, "Error cleaning up inserted user data")

@@ -2,6 +2,7 @@ package services_test
 
 import (
 	"context"
+	"database/sql"
 	"errors"
 	"testing"
 
@@ -130,9 +131,9 @@ func TestUpdateMovie(t *testing.T) {
 			mockSetup: func(mockRepo *mocks.MockMovieRepository) {
 				mockRepo.EXPECT().
 					FindMovieByID(gomock.Any(), "nonexistent-id").
-					Return(models.Movie{}, nil)
+					Return(models.Movie{}, sql.ErrNoRows)
 			},
-			expectedError: errors.New("service err: movie is not exists"),
+			expectedError: sql.ErrNoRows,
 		},
 		{
 			name: "Failure - Error finding movie",
@@ -729,6 +730,102 @@ func TestUnvoteMovie(t *testing.T) {
 			} else {
 				assert.EqualError(t, err, tc.expectedErr.Error())
 			}
+		})
+	}
+}
+
+func TestGetUserVotedMovies(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	mockRepo := mocks.NewMockMovieRepository(ctrl)
+
+	// Create the service with mocked repositories
+	service := services.NewMovieService(mockRepo, nil)
+
+	ctx := context.Background()
+
+	// Define test cases
+	tests := []struct {
+		name           string
+		userID         string
+		votedMovieIDs  []string
+		movieDetails   []models.Movie
+		voteRepoErr    error
+		movieRepoErr   error
+		expectedResult []models.Movie
+		expectedErr    error
+	}{
+		{
+			name:          "Success",
+			userID:        "user1",
+			votedMovieIDs: []string{"movie1", "movie2"},
+			movieDetails: []models.Movie{
+				{ID: "movie1", Title: "Movie 1"},
+				{ID: "movie2", Title: "Movie 2"},
+			},
+			expectedResult: []models.Movie{
+				{ID: "movie1", Title: "Movie 1"},
+				{ID: "movie2", Title: "Movie 2"},
+			},
+			expectedErr: nil,
+		},
+		{
+			name:           "Vote repository error",
+			userID:         "user1",
+			votedMovieIDs:  nil,
+			voteRepoErr:    errors.New("repository error"),
+			expectedResult: nil,
+			expectedErr:    errors.New("repository error"),
+		},
+		{
+			name:           "Movie repository error",
+			userID:         "user1",
+			votedMovieIDs:  []string{"movie1", "movie2"},
+			movieRepoErr:   errors.New("repository error"),
+			expectedResult: nil,
+			expectedErr:    errors.New("repository error"),
+		},
+		{
+			name:           "No voted movies",
+			userID:         "user2",
+			votedMovieIDs:  []string{},
+			expectedResult: []models.Movie{},
+			expectedErr:    nil,
+		},
+	}
+
+	// Iterate over test cases
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// Mock VoteRepository behavior
+			mockRepo.
+				EXPECT().
+				GetUserVotedMovieIDs(ctx, tt.userID).
+				Return(tt.votedMovieIDs, tt.voteRepoErr).
+				Times(1)
+
+			// Mock MovieRepository behavior only if no voteRepoErr
+			if tt.voteRepoErr == nil && len(tt.votedMovieIDs) > 0 {
+				mockRepo.
+					EXPECT().
+					GetMoviesByIDs(ctx, gomock.Eq(tt.votedMovieIDs)).
+					Return(tt.movieDetails, tt.movieRepoErr).
+					Times(1)
+			} else if tt.voteRepoErr == nil {
+				// If no movie IDs are returned, GetMoviesByIDs shouldn't be called.
+				mockRepo.
+					EXPECT().
+					GetMoviesByIDs(ctx, gomock.Any()).
+					Times(0)
+			}
+
+			// Call the service method
+			result, err := service.GetUserVotedMovies(ctx, tt.userID)
+
+			// Validate the results
+			assert.Equal(t, tt.expectedErr, err)
+			assert.Equal(t, tt.expectedResult, result)
 		})
 	}
 }

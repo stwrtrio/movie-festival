@@ -3,7 +3,7 @@ package models
 import "time"
 
 type CreateMovieRequest struct {
-	Title       string   `json:"title" validate:"required"`
+	Title       string   `json:"title" validate:"required,max=150"`
 	Description string   `json:"description" validate:"required"`
 	Duration    int      `json:"duration" validate:"required,min=1"`
 	Genres      []string `json:"genres" validate:"min=1,dive,required"`

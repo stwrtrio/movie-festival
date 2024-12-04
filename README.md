@@ -20,8 +20,8 @@ The Movie Festival API is a backend service for managing movies, genres, artists
 
 ## API Endpoints
 #### Api List
-[- Admin API Endpoints](./files/doc/Admin-Api-Documentation.md#admin-api-documentation)
-[- User API Endpoints](./files/doc/User-Api-Documentation.md#user-api-documentation)
+- [Admin API Endpoints](./files/doc/Admin-Api-Documentation.md#admin-api-documentation)
+- [User API Endpoints](./files/doc/User-Api-Documentation.md#user-api-documentation)
 
 
 ## Database Schema

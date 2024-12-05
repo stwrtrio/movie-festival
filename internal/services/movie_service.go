@@ -28,6 +28,7 @@ type MovieService interface {
 	VoteMovie(ctx context.Context, userID, movieID string) error
 	UnvoteMovie(ctx context.Context, userID, movieID string) error
 	GetUserVotedMovies(ctx context.Context, userID string) ([]models.Movie, error)
+	GetMostVotedMovie(ctx context.Context) (*models.Movie, error)
 }
 
 type movieService struct {
@@ -181,4 +182,8 @@ func (s *movieService) GetUserVotedMovies(ctx context.Context, userID string) ([
 	}
 
 	return votedMovies, nil
+}
+
+func (s *movieService) GetMostVotedMovie(ctx context.Context) (*models.Movie, error) {
+	return s.repo.GetMostVotedMovie(ctx)
 }

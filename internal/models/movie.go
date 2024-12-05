@@ -20,6 +20,7 @@ type Movie struct {
 	WatchURL    string    `json:"watch_url"`
 	Views       int       `json:"views"`
 	Artists     []Artist  `json:"artists"` // Associated artists
+	Votes       int       `json:"votes"`
 	CreatedAt   time.Time `json:"created_at"`
 	UpdatedAt   time.Time `json:"updated_at"`
 }

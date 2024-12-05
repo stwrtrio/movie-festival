@@ -27,6 +27,7 @@ type MovieRepository interface {
 	DeleteVote(ctx context.Context, voteID string) error
 	GetMoviesByIDs(ctx context.Context, movieIDs []string) ([]models.Movie, error)
 	GetUserVotedMovieIDs(ctx context.Context, userID string) ([]string, error)
+	GetMostVotedMovie(ctx context.Context) (*models.Movie, error)
 }
 
 type movieRepository struct {
@@ -585,4 +586,23 @@ func (r *movieRepository) GetUserVotedMovieIDs(ctx context.Context, userID strin
 	}
 
 	return movieIDs, nil
+}
+
+func (r *movieRepository) GetMostVotedMovie(ctx context.Context) (*models.Movie, error) {
+	query := `
+		SELECT m.id, m.title, COUNT(v.movie_id) AS votes
+		FROM movies m
+		JOIN votes v ON m.id = v.movie_id
+		GROUP BY m.id, m.title
+		ORDER BY votes DESC
+		LIMIT 1
+	`
+
+	movie := &models.Movie{}
+	err := r.db.QueryRowContext(ctx, query).Scan(&movie.ID, &movie.Title, &movie.Votes)
+	if err != sql.ErrNoRows {
+		return nil, err
+	}
+
+	return movie, nil
 }

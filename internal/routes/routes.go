@@ -32,4 +32,5 @@ func RegisterRoutes(e *echo.Echo, movieController *controllers.MovieController, 
 	adminGroup.POST("/movie/:id", movieController.UpdateMovie)
 	adminGroup.GET("/movies/most-viewed", movieController.GetMostViewedMovie)
 	adminGroup.GET("/movies/most-viewed-genres", movieController.GetMostViewedGenre)
+	adminGroup.GET("/movies/most-voted", movieController.GetMostVotedMovie)
 }

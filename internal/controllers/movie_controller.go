@@ -309,3 +309,14 @@ func (c *MovieController) GetUserVotesController(ctx echo.Context) error {
 
 	return utils.SuccessResponse(ctx, http.StatusOK, "Voted movies retrieved successfully", votedMovies)
 }
+
+func (c *MovieController) GetMostVotedMovie(ctx echo.Context) error {
+	cx := ctx.Request().Context()
+
+	votedMovies, err := c.service.GetMostVotedMovie(cx)
+	if err != nil {
+		return utils.FailResponse(ctx, http.StatusInternalServerError, "Failed to fetch most voted movies")
+	}
+
+	return utils.SuccessResponse(ctx, http.StatusOK, "Voted movies retrieved successfully", votedMovies)
+}

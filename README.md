@@ -25,8 +25,8 @@ The Movie Festival API is a backend service for managing movies, genres, artists
 - [User API Endpoints](./files/doc/User-Api-Documentation.md#user-api-documentation)
 
 #### Testing
-To test the endpoint, you can open swagger with this link: http://localhost:8080/swagger/index.html
-Follong the instruction in the API List Documentation.
+To test the endpoint, you can open swagger with this link: http://localhost:8080/swagger/index.html  
+Follow the instruction in the API List Documentation.
 
 ## Database Schema
 ### Tables

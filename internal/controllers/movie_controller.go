@@ -23,6 +23,17 @@ func NewMovieController(service services.MovieService) *MovieController {
 	return &MovieController{service}
 }
 
+// @Summary Create Movie
+// @Description To create movie
+// @Tags Admin
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param request body models.CreateMovieRequest true "Movie Request"
+// @Success 200 {object} utils.JsonResponse "Success create movie"
+// @Failure 400 {object} utils.JsonResponse "Invalid input"
+// @Failure 401 {object} utils.JsonResponse "Unauthorized"
+// @Router /api/admin/movie [post]
 func (c *MovieController) CreateMovie(ctx echo.Context) error {
 	cx := ctx.Request().Context()
 	req := new(models.CreateMovieRequest)
@@ -65,6 +76,17 @@ func (c *MovieController) CreateMovie(ctx echo.Context) error {
 	return utils.SuccessResponse(ctx, http.StatusCreated, "Movie created successfully", nil)
 }
 
+// @Summary Update Movie
+// @Description To update movie
+// @Tags Admin
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param request body models.CreateMovieRequest true "Movie Request"
+// @Success 200 {object} utils.JsonResponse "Success update movie"
+// @Failure 400 {object} utils.JsonResponse "Invalid input"
+// @Failure 401 {object} utils.JsonResponse "Unauthorized"
+// @Router /api/admin/movie/:id [post]
 func (c *MovieController) UpdateMovie(ctx echo.Context) error {
 	cx := ctx.Request().Context()
 	movieID := ctx.Param("id")
@@ -111,6 +133,16 @@ func (c *MovieController) UpdateMovie(ctx echo.Context) error {
 	return utils.SuccessResponse(ctx, http.StatusOK, "Movie updated successfully", nil)
 }
 
+// @Summary Get Most Viewed Movie
+// @Description To get most viewd movie
+// @Tags Admin
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Success 200 {object} utils.JsonResponse "Success get most viewd movie"
+// @Failure 400 {object} utils.JsonResponse "Invalid input"
+// @Failure 401 {object} utils.JsonResponse "Unauthorized"
+// @Router /api/admin/most-viewed [get]
 func (c *MovieController) GetMostViewedMovie(ctx echo.Context) error {
 	cx := ctx.Request().Context()
 	movie, err := c.service.GetMostViewedMovie(cx)
@@ -121,6 +153,20 @@ func (c *MovieController) GetMostViewedMovie(ctx echo.Context) error {
 	return utils.SuccessResponse(ctx, http.StatusOK, "", movie)
 }
 
+// @Summary Get Most Viewed Movie Genre
+// @Description To get most viewed movie genre
+// @Tags Admin
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param id path string true "ID of the most view movie"
+// @Param page query int false "Page number for pagination"
+// @Param page_size query int false "Number of items per page"
+// @Param sort_order query string false "Sort order (ASC or DESC), default is DESC"
+// @Success 200 {object} utils.JsonResponse "Success get most viewd movie"
+// @Failure 400 {object} utils.JsonResponse "Invalid input"
+// @Failure 401 {object} utils.JsonResponse "Unauthorized"
+// @Router /api/admin/most-viewed-genres [get]
 func (c *MovieController) GetMostViewedGenre(ctx echo.Context) error {
 	// Retrieve pagination and sorting parameters from the query string
 	pageStr := ctx.QueryParam("page")
@@ -159,6 +205,17 @@ func (c *MovieController) GetMostViewedGenre(ctx echo.Context) error {
 	return utils.SuccessResponse(ctx, http.StatusOK, "", genreViews)
 }
 
+// @Summary Get All Movie
+// @Description To get all movie
+// @Tags User
+// @Accept json
+// @Produce json
+// @Param limit query int false "Limit number for pagination"
+// @Param offset query int false "Offset of items per page"
+// @Param use-cache query string false "Offset of items per page"
+// @Success 200 {object} utils.JsonResponse "Success get most viewd movie"
+// @Failure 400 {object} utils.JsonResponse "Invalid input"
+// @Router /api/movies [get]
 // GetAllMovies handles GET requests to fetch all movies with pagination
 func (c *MovieController) GetAllMovies(ctx echo.Context) error {
 	cx := ctx.Request().Context()
@@ -201,6 +258,17 @@ func (c *MovieController) GetAllMovies(ctx echo.Context) error {
 	return utils.SuccessResponse(ctx, http.StatusOK, "", movies)
 }
 
+// @Summary Search Movie
+// @Description To search all movie by keyword
+// @Tags User
+// @Accept json
+// @Produce json
+// @Param query query string false "Keyword to search movie"
+// @Param limit query int false "Limit number for pagination"
+// @Param offset query int false "Offset of items per page"
+// @Success 200 {object} utils.JsonResponse "Success search movie"
+// @Failure 400 {object} utils.JsonResponse "Invalid input"
+// @Router /api/movies/search [get]
 func (c *MovieController) SearchMovies(ctx echo.Context) error {
 	query := ctx.QueryParam("query")
 	limit, err := strconv.Atoi(ctx.QueryParam("limit"))
@@ -224,6 +292,15 @@ func (c *MovieController) SearchMovies(ctx echo.Context) error {
 	return utils.SuccessResponse(ctx, http.StatusOK, "", movies)
 }
 
+// @Summary Track View Movie
+// @Description To track view movie
+// @Tags User
+// @Accept json
+// @Produce json
+// @Param id query string true "id of the movie"
+// @Success 200 {object} utils.JsonResponse "Success track movie"
+// @Failure 400 {object} utils.JsonResponse "Invalid input"
+// @Router /api/movies/{id}/view [post]
 func (c *MovieController) TrackMovieView(ctx echo.Context) error {
 	movieID := ctx.Param("id")
 	err := c.service.TrackMovieView(ctx.Request().Context(), movieID)
@@ -234,6 +311,15 @@ func (c *MovieController) TrackMovieView(ctx echo.Context) error {
 	return utils.SuccessResponse(ctx, http.StatusOK, "Viewership tracked successfully", nil)
 }
 
+// @Summary Vote Movie
+// @Description To vote the movie
+// @Tags User
+// @Accept json
+// @Produce json
+// @Param id query string true "id of the movie"
+// @Success 200 {object} utils.JsonResponse "Success vote movie"
+// @Failure 400 {object} utils.JsonResponse "Invalid input"
+// @Router /api/user/movies/{id}/vote [post]
 func (c *MovieController) VoteMovie(ctx echo.Context) error {
 	cx := ctx.Request().Context()
 	// Get user claims from context
@@ -262,6 +348,15 @@ func (c *MovieController) VoteMovie(ctx echo.Context) error {
 	return utils.SuccessResponse(ctx, http.StatusOK, "Movie voted successfully", nil)
 }
 
+// @Summary Unvote Movie
+// @Description To unvote the movie
+// @Tags User
+// @Accept json
+// @Produce json
+// @Param id query string true "id of the movie"
+// @Success 200 {object} utils.JsonResponse "Success unvote movie"
+// @Failure 400 {object} utils.JsonResponse "Invalid input"
+// @Router /api/user/movies/{id}/unvote [post]
 func (c *MovieController) UnvoteMovie(ctx echo.Context) error {
 	cx := ctx.Request().Context()
 
@@ -290,6 +385,15 @@ func (c *MovieController) UnvoteMovie(ctx echo.Context) error {
 	return utils.SuccessResponse(ctx, http.StatusOK, "Movie unvoted successfully", nil)
 }
 
+// @Summary Get User Vote
+// @Description To get movie voted by user
+// @Tags User
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Success 200 {object} utils.JsonResponse "Success get movie voted by user"
+// @Failure 400 {object} utils.JsonResponse "Invalid input"
+// @Router /api/user/votes [get]
 // GetUserVotesController handles fetching the list of voted movies for a user.
 func (c *MovieController) GetUserVotesController(ctx echo.Context) error {
 	cx := ctx.Request().Context()
@@ -310,6 +414,15 @@ func (c *MovieController) GetUserVotesController(ctx echo.Context) error {
 	return utils.SuccessResponse(ctx, http.StatusOK, "Voted movies retrieved successfully", votedMovies)
 }
 
+// @Summary Most Voted Movie
+// @Description To get most voted movie
+// @Tags Admin
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Success 200 {object} utils.JsonResponse "Success vote movie"
+// @Failure 400 {object} utils.JsonResponse "Invalid input"
+// @Router /api/admin/movies/most-voted [get]
 func (c *MovieController) GetMostVotedMovie(ctx echo.Context) error {
 	cx := ctx.Request().Context()
 

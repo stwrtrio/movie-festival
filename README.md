@@ -17,12 +17,16 @@ The Movie Festival API is a backend service for managing movies, genres, artists
 - GoMock: For mocking the repository in unit tests.
 - Redis: Used for caching frequently accessed data.
 - JWT: Tokens are securely signed using a secret key to prevent tampering.
+- Swagger: Documentation and testing API
 
 ## API Endpoints
-#### Api List
+#### Api List Documentation
 - [Admin API Endpoints](./files/doc/Admin-Api-Documentation.md#admin-api-documentation)
 - [User API Endpoints](./files/doc/User-Api-Documentation.md#user-api-documentation)
 
+#### Testing
+To test the endpoint, you can open swagger with this link: http://localhost:8080/swagger/index.html
+Follong the instruction in the API List Documentation.
 
 ## Database Schema
 ### Tables
@@ -89,7 +93,9 @@ make run
 2. Testing:
     - Executes all unit and integration tests in the project using go test.
     - Confirms that all tests pass without errors.
-3. Running the Application:
+3. Swagger:
+    - Generate Documentation and testing for API
+4. Running the Application:
     - If both linting and testing succeed, the application is started using go run.
 
 ### Expected Behavior

@@ -1,0 +1,473 @@
+definitions:
+  models.CreateMovieRequest:
+    properties:
+      artists:
+        description: List of artist names
+        items:
+          type: string
+        minItems: 1
+        type: array
+      description:
+        type: string
+      duration:
+        minimum: 1
+        type: integer
+      genres:
+        items:
+          type: string
+        minItems: 1
+        type: array
+      title:
+        maxLength: 150
+        type: string
+      watch_url:
+        type: string
+    required:
+    - artists
+    - description
+    - duration
+    - genres
+    - title
+    - watch_url
+    type: object
+  models.LoginRequest:
+    properties:
+      password:
+        type: string
+      username:
+        type: string
+    required:
+    - password
+    - username
+    type: object
+  models.RegisterRequest:
+    properties:
+      password:
+        maxLength: 50
+        minLength: 6
+        type: string
+      username:
+        maxLength: 50
+        minLength: 3
+        type: string
+    required:
+    - password
+    - username
+    type: object
+  utils.JsonResponse:
+    properties:
+      code:
+        type: integer
+      data: {}
+      message:
+        type: string
+      status:
+        type: string
+    type: object
+info:
+  contact: {}
+paths:
+  /api/admin/most-viewed:
+    get:
+      consumes:
+      - application/json
+      description: To get most viewd movie
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success get most viewd movie
+          schema:
+            $ref: '#/definitions/utils.JsonResponse'
+        "400":
+          description: Invalid input
+          schema:
+            $ref: '#/definitions/utils.JsonResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.JsonResponse'
+      security:
+      - BearerAuth: []
+      summary: Get Most Viewed Movie
+      tags:
+      - Admin
+  /api/admin/most-viewed-genres:
+    get:
+      consumes:
+      - application/json
+      description: To get most viewed movie genre
+      parameters:
+      - description: ID of the most view movie
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Page number for pagination
+        in: query
+        name: page
+        type: integer
+      - description: Number of items per page
+        in: query
+        name: page_size
+        type: integer
+      - description: Sort order (ASC or DESC), default is DESC
+        in: query
+        name: sort_order
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success get most viewd movie
+          schema:
+            $ref: '#/definitions/utils.JsonResponse'
+        "400":
+          description: Invalid input
+          schema:
+            $ref: '#/definitions/utils.JsonResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.JsonResponse'
+      security:
+      - BearerAuth: []
+      summary: Get Most Viewed Movie Genre
+      tags:
+      - Admin
+  /api/admin/movie:
+    post:
+      consumes:
+      - application/json
+      description: To create movie
+      parameters:
+      - description: Movie Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.CreateMovieRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success create movie
+          schema:
+            $ref: '#/definitions/utils.JsonResponse'
+        "400":
+          description: Invalid input
+          schema:
+            $ref: '#/definitions/utils.JsonResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.JsonResponse'
+      security:
+      - BearerAuth: []
+      summary: Create Movie
+      tags:
+      - Admin
+  /api/admin/movie/:id:
+    post:
+      consumes:
+      - application/json
+      description: To update movie
+      parameters:
+      - description: Movie Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.CreateMovieRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success update movie
+          schema:
+            $ref: '#/definitions/utils.JsonResponse'
+        "400":
+          description: Invalid input
+          schema:
+            $ref: '#/definitions/utils.JsonResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.JsonResponse'
+      security:
+      - BearerAuth: []
+      summary: Update Movie
+      tags:
+      - Admin
+  /api/admin/movies/most-voted:
+    get:
+      consumes:
+      - application/json
+      description: To get most voted movie
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success vote movie
+          schema:
+            $ref: '#/definitions/utils.JsonResponse'
+        "400":
+          description: Invalid input
+          schema:
+            $ref: '#/definitions/utils.JsonResponse'
+      security:
+      - BearerAuth: []
+      summary: Most Voted Movie
+      tags:
+      - Admin
+  /api/movies:
+    get:
+      consumes:
+      - application/json
+      description: To get all movie
+      parameters:
+      - description: Limit number for pagination
+        in: query
+        name: limit
+        type: integer
+      - description: Offset of items per page
+        in: query
+        name: offset
+        type: integer
+      - description: Offset of items per page
+        in: query
+        name: use-cache
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success get most viewd movie
+          schema:
+            $ref: '#/definitions/utils.JsonResponse'
+        "400":
+          description: Invalid input
+          schema:
+            $ref: '#/definitions/utils.JsonResponse'
+      summary: Get All Movie
+      tags:
+      - User
+  /api/movies/{id}/view:
+    post:
+      consumes:
+      - application/json
+      description: To track view movie
+      parameters:
+      - description: id of the movie
+        in: query
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success track movie
+          schema:
+            $ref: '#/definitions/utils.JsonResponse'
+        "400":
+          description: Invalid input
+          schema:
+            $ref: '#/definitions/utils.JsonResponse'
+      summary: Track View Movie
+      tags:
+      - User
+  /api/movies/search:
+    get:
+      consumes:
+      - application/json
+      description: To search all movie by keyword
+      parameters:
+      - description: Keyword to search movie
+        in: query
+        name: query
+        type: string
+      - description: Limit number for pagination
+        in: query
+        name: limit
+        type: integer
+      - description: Offset of items per page
+        in: query
+        name: offset
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success search movie
+          schema:
+            $ref: '#/definitions/utils.JsonResponse'
+        "400":
+          description: Invalid input
+          schema:
+            $ref: '#/definitions/utils.JsonResponse'
+      summary: Search Movie
+      tags:
+      - User
+  /api/user/login:
+    post:
+      consumes:
+      - application/json
+      description: Authenticate a user and return a JWT token
+      parameters:
+      - description: Login Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Access granted, includes JWT token
+          schema:
+            $ref: '#/definitions/utils.JsonResponse'
+        "400":
+          description: Invalid input
+          schema:
+            $ref: '#/definitions/utils.JsonResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.JsonResponse'
+      summary: User Login
+      tags:
+      - User
+  /api/user/logout:
+    post:
+      consumes:
+      - application/json
+      description: Logout an authenticated user by invalidating token.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success create user
+          schema:
+            $ref: '#/definitions/utils.JsonResponse'
+        "400":
+          description: Invalid input
+          schema:
+            $ref: '#/definitions/utils.JsonResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.JsonResponse'
+      security:
+      - BearerAuth: []
+      summary: User Logout
+      tags:
+      - User
+  /api/user/movies/{id}/unvote:
+    post:
+      consumes:
+      - application/json
+      description: To unvote the movie
+      parameters:
+      - description: id of the movie
+        in: query
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success unvote movie
+          schema:
+            $ref: '#/definitions/utils.JsonResponse'
+        "400":
+          description: Invalid input
+          schema:
+            $ref: '#/definitions/utils.JsonResponse'
+      summary: Unvote Movie
+      tags:
+      - User
+  /api/user/movies/{id}/vote:
+    post:
+      consumes:
+      - application/json
+      description: To vote the movie
+      parameters:
+      - description: id of the movie
+        in: query
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success vote movie
+          schema:
+            $ref: '#/definitions/utils.JsonResponse'
+        "400":
+          description: Invalid input
+          schema:
+            $ref: '#/definitions/utils.JsonResponse'
+      summary: Vote Movie
+      tags:
+      - User
+  /api/user/register:
+    post:
+      consumes:
+      - application/json
+      description: Create User
+      parameters:
+      - description: Register Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.RegisterRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success create user
+          schema:
+            $ref: '#/definitions/utils.JsonResponse'
+        "400":
+          description: Invalid input
+          schema:
+            $ref: '#/definitions/utils.JsonResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.JsonResponse'
+      summary: User Register
+      tags:
+      - User
+  /api/user/votes:
+    get:
+      consumes:
+      - application/json
+      description: To get movie voted by user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success get movie voted by user
+          schema:
+            $ref: '#/definitions/utils.JsonResponse'
+        "400":
+          description: Invalid input
+          schema:
+            $ref: '#/definitions/utils.JsonResponse'
+      security:
+      - BearerAuth: []
+      summary: Get User Vote
+      tags:
+      - User
+securityDefinitions:
+  BearerAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

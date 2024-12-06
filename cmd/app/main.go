@@ -1,3 +1,7 @@
+// @securityDefinitions.apikey BearerAuth
+// @in header
+// @name Authorization
+
 package main
 
 import (
@@ -14,6 +18,8 @@ import (
 	"github.com/go-playground/validator/v10"
 	"github.com/joho/godotenv"
 	"github.com/labstack/echo/v4"
+	_ "github.com/stwrtrio/movie-festival/docs" // Import the generated docs package
+	echoSwagger "github.com/swaggo/echo-swagger"
 )
 
 func main() {
@@ -47,6 +53,9 @@ func main() {
 	// Controller
 	movieController := controllers.NewMovieController(movieService)
 	userController := controllers.NewUserController(userService)
+
+	// Swagger route
+	e.GET("/swagger/*", echoSwagger.WrapHandler)
 
 	// Register Routes
 	routes.RegisterRoutes(e, movieController, userController)

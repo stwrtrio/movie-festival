@@ -10,7 +10,7 @@ MOCK_DEST_DIR = ./tests/mocks
 .PHONY: all run lint test start clean-test build mocks
 
 # Default target
-run: lint mocks test start
+run: lint mocks test swag start
 
 # Target to check syntax (lint)
 lint:
@@ -28,6 +28,11 @@ test:
 start:
 	@echo "Starting the application..."
 	@go run $(APP_CMD)
+
+# Target to run the application
+swag:
+	@echo "Generate Swagger Docs..."
+	@swag init -g $(APP_CMD)
 
 # Target to clean test cache (Optional)
 clean-test:
